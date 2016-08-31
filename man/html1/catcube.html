@@ -1,0 +1,45 @@
+<html>
+<title>catcube man page</title>
+<body>
+<pre>
+Name
+       catcube - cube/image concatenation to one cube
+
+Synopsis
+       catcube [options] [-o output] &lt;cube1&gt; [cube2] ... [cube n]
+
+Description
+       catcube  creates  an output cube that is sum on the z-axis of all other
+       cubes given on command line in order of appearance from left to  right.
+       e.g.
+       catcube -o outcube cube.001 cube.002 image.001 cube.003
+       will  create  an output cube ’outcube’ with planes consisting of planes
+       cube.001 first, then planes of cube.002, then image.001, then cube.003.
+       All planes shall have the same size (width, height). The pixel depth of
+       the output cube is the most restrictive, i.e. the one which  needs  the
+       highest amount of bits.  catcube accepts jokers on command line :
+       &gt; catcube -o output.fits ADO*.fits
+
+       The  default  output name is ’cat.fits’. The -o option may be specified
+       anywhere on the command line. Example: the following lines are strictly
+       equivalent:
+
+       catcube f0001 f0002 -o output.fits f003 f004
+
+       catcube -o output.fits f0001 f0002 f003 f004
+
+       catcube f0001 f0002 f003 f004 -o output.fits
+
+Files
+       Input files shall all comply with FITS format Output file pixel type is
+       the highest input pixel type encountered.
+
+       The original FITS header  of the first given FITS file on command  line
+       is  conserved  along, except for the following keywords: NAXIS, NAXISn,
+       BITPIX, BSCALE, BZERO, which are related to the newly created file.
+
+       HISTORY keywords are appended  to  the  FITS  header  to  indicate  the
+       eclipse process modifications.
+</pre>
+</body>
+</html>

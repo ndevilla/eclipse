@@ -1,0 +1,17 @@
+
+Wide Field Imager Reduction recipes
+-----------------------------------
+
+
+The recipes found in this directory have been written in the context of the
+BeoWFI project, aimed at providing a data reduction facility for the WFI
+instrument based on a Beowulf cluster.
+
+The recipe functionalities are drawn from the eclipse library. The recipe
+code has been written by N. Devillard, based on inputs from Aniello Grado,
+Andreas Wicenec, Stefan Bogun, Miguel Albrecht, Peter Quinn. The Beowulf
+demonstration cluster at ESO is maintained by Dieter Suchar and Andreas
+Wicenec.
+
+N. Devillard
+Wed Oct 25 13:14:02 CEST 2000

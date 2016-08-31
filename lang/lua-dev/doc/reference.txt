@@ -1,0 +1,314 @@
+------------------------------------------------------------
+    add -- Add two cubes or a cube and a double.
+
+    Usage:
+    % add(c1, c2)   --> c1 = c1 + c2
+    % add(c1, 3)    --> c1 = c1 + 3
+    % add( 7, c1)   --> c1 =  7 + c1
+
+    This function performs an addition with cube arguments. If two cubes
+    are given, the first one is modified to contain the results of the
+    operation. If only one cube is given in its arguments, the cube is
+    modified to contain the results of the operation.
+------------------------------------------------------------
+
+------------------------------------------------------------
+    mul -- Multiply two cubes or a cube and a double.
+
+    Usage:
+    % mul(c1, c2)   --> c1 = c1 * c2
+    % mul(c1, 3)    --> c1 = c1 * 3
+    % mul( 7, c1)   --> c1 = 7  * c1
+
+    This function performs a multiplication with cube arguments. If two
+    cubes are given, the first one is modified to contain the results of
+    the operation. If only one cube is given in its arguments, the cube is
+    modified to contain the results of the operation.
+------------------------------------------------------------
+
+------------------------------------------------------------
+    sub -- Subtraction between two cubes or a cube and a double.
+
+    Usage:
+    % sub(c1, c2)       --> c1 = c1 - c2
+    % sub(c1, 3)        --> c1 = c1 - 3
+    % sub( 7, c1)       --> c1 =  7 - c1
+
+    This function performs a subtraction with cube arguments. If two
+    cubes are given, the first one is modified to contain the results of
+    the operation. If only one cube is given in its arguments, the cube is
+    modified to contain the results of the operation.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+    div -- Division between two cubes or a cube and a double.
+
+    Usage:
+    % div(c1, c2)       --> c1 = c1 / c2
+    % div(c1, 3)        --> c1 = c1 / 3
+    % div( 7, c1)       --> c1 =  7 / c1
+
+    This function performs a subtraction with cube arguments. If two
+    cubes are given, the first one is modified to contain the results of
+    the operation. If only one cube is given in its arguments, the cube is
+    modified to contain the results of the operation.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+    collapse -- collapse a cube over X or Y.
+
+    Usage:
+    % a = collapse(b)
+
+    % params = {
+                    dir="vertical",     -- "vertical" or "horizontal"
+                    median=1,           -- optional median filtering
+                    reject= {           -- rejection parameters
+                        min=3,          -- min values to reject
+                        max=3           -- max values to reject
+                    }
+                }
+    % a = collapse(b, params)
+
+    This function is mostly used to collapse images, although it will also
+    work on cubes by applying the collapse to every plane in the input
+    cube. A parameter table is expected (otherwise the function runs with
+    default values). This table should contain the following fields:
+
+    dir
+        is a string containing either "vertical" or "horizontal". This
+        indicates the direction for collapsing. Default is "vertical".
+    
+    median
+        is an integer. If non-zero, only the median value of each row or
+        column will be kept as result of the collapse, with possible
+        rejection. Default is 0 (no median, thus no rejection).
+
+    reject
+        is a table, expected to contain two fields:
+        min     is the number of min values to reject.
+        max     is the number of max values to reject.
+        The reject option will only be considered if median is activated
+        (non-zero). The min lowest and max highest pixel values on each row
+        or column are rejected before computing the median and keeping it
+        as the result of the collapse.
+------------------------------------------------------------
+
+------------------------------------------------------------
+ 
+  load -- Load a cube into memory.
+
+    Usage:
+    % c = load("a.fits")
+        Load the file 'a.fits' as a cube in memory.
+
+    Usage:
+    % c = load("framelist.ascii")
+        Load the ASCII list 'framelist.ascii' as a cube in memory.
+
+  This function loads a cube into memory. It expects one single argument
+  (a string) and will return either a new cube object, or nil.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+
+  save -- Save a cube to disk
+
+    Usage:
+    % save(c, "output.fits")
+        Save the cube 'c' to a file called 'output.fits', with a minimal
+        (default) FITS header.
+
+    Usage:
+    % save(c, "output.fits", "ref.fits")
+        Save the cube 'c' to a file called 'output.fits', using the file
+        'ref.fits' as a reference for the FITS header.
+
+    Usage:
+    % save(c, "base_%d.fits")
+        Save the cube 'c' to split files called base_1.fits, base_2.fits,
+        etc., using a default minimal FITS header.
+    
+    Usage:
+    % save(c, "base_%d.fits", "ref.fits")
+        Save the cube 'c' to split files called base_1.fits, base_2.fits,
+        etc., using the file 'ref.fits' as a reference for the FITS header.
+
+    'save' will recognize that you require split file outputs by detecting
+    the presence of a '%d' formatter in the output name string. You can
+    also specify up to 6 leading zeros in the counter, using the C
+    notation.
+    Examples:
+
+    "base_%d.fits"      -> base_1.fits, base_2.fits
+    "base_%02d.fits"    -> base_01.fits, base_02.fits
+    "base_%03d.fits"    -> base_001.fits, base_002.fits
+    ...
+    "base_%06d.fits"    -> base_000001.fits, base_000002.fits, etc.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+
+    del -- Discard a cube.
+
+    Usage:
+    % del(c)
+
+    This function forces the deletion of all data contained within the
+    given cube. This is not mandatory, since the garbage collector will
+    eventually take care of deleting the cube after it got out of scope,
+    but it might be useful in situations where there is only one global
+    scope, or when you want to make sure that memory will be available for
+    the next operation.
+
+    NB: Deleting a cube the soft way can be done by assigning nil to it.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+    deadpix -- dead pixel handling over a cube
+
+    Usage:
+    % deadpix(cube, badpixmap)
+
+    This function is used to correct bad pixels in a cube according to a
+    bad pixel map. The same pixel map is applied over each plane in the
+    cube. See iproc/dead_pixels.c for details about the replacement
+    implementation.
+------------------------------------------------------------
+
+------------------------------------------------------------
+    filter -- Apply a named filter to a cube.
+
+    Usage:
+    % filter(c, "filter_name")
+    % filter(c, "filter_name", { values })
+
+    Applies a named filter to a cube. Most filters do not require any extra
+    parameter. Some filters require extra numerical values to be passed in
+    a table as a third argument.
+    Valid filters are:
+
+    - user-linear
+    - mean3
+    - dx
+    - dy
+    - d2x
+    - d2y
+    - contour1
+    - contour2
+    - contour3
+    - contrast1
+    - mean5
+    - min
+    - max
+    - median
+    - max-min
+    - user-morpho
+    - 3x1
+    - flat
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+
+    fits_get -- FITS header interface in Lua.
+
+    Usage:
+    val = fits_get("a.fits", "naxis", "det.dit")
+    val = fits_get(a, "naxis", "det.dit")
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+
+    framelist -- Read a framelist into a table of strings.
+
+    Usage:
+    tab = framelist("framelist.ascii")
+
+    The returned table (tab) contains the following informations:
+
+    n       Number of files found in the list.
+    name    A table containing file names from 1 to n.
+    type    A table containing file types from 1 to n.
+
+    If there is no second column in the framelist file, there is no
+    'type' table in the returned table. If some file types are empty
+    in the input table, the 'type' table contains nil values.
+------------------------------------------------------------
+
+------------------------------------------------------------
+
+    merge -- Merge several cubes together.
+
+    Usage:
+    % big = merge( { cube1, cube2, ..., cubei } )
+    The following form is also valid, since the only argument to this
+    function is a list (the parentheses can then be omitted).
+    % big = merge { cube1, cube2, ..., cubei }
+
+    The following merges a number of input cubes into a single one.
+    The input cubes are then deallocated within this function. Notice that
+    image pointers are copied to the new (returned) cube, and only the
+    top-level structs for each input cube are destroyed.
+    The input must be a list of cubes, i.e. {a,b,c,...} where a,b,c are valid
+    cubes.
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+    load_pixmap -- Load a pixel map into memory
+
+    Usage:
+    % a = load_pixmap("filename")
+
+    Use this function to load a pixel map. A pixel map is by definition
+    a FITS image (NAXIS=2) containing binary pixels in integer format
+    (BITPIX=8, 16 or 32). Any pixel value different from zero will be
+    understood as 1, any zero value understood as 0.
+
+    A pixel map is currently one single plane. This might be changed
+    in the future if there is a need for a collection of pixel maps,
+    to make them similar to cubes.
+------------------------------------------------------------
+
+------------------------------------------------------------
+    stats -- Cube statistics
+
+    Usage:
+    % s = stats(cube)
+    % s = stats(cube, badpixmap)
+    % s = stats(cube, {xmin, xmax, ymin, ymax})
+    % s = stats(cube, badpixmap, {xmin, xmax, ymin, ymax})
+    % s = stats(cube, {xmin, xmax, ymin, ymax}, badpixmap)
+
+    This function computes a number of statistical values on a cube and
+    returns a table containing all results. Further arguments are
+    optional, they specify the name of a possible bad pixel map to take
+    into account for computation, and/or a table containing four integers
+    specifying the zone where to compute statistics as:
+    {xmin, xmax, ymin, ymax}.
+
+    Coordinates are given using the FITS convention (x from 1 to lx, y
+    from 1 to ly, x increasing from left to right, y increasing from bottom
+    to top).
+
+    The returned object is a table containing one table for each input
+    plane in the cube. Each plane table contains the following double
+    values:
+
+    { plane, min, max, mean, median, rms, energy, flux }
+
+    Notice that values are /named/ in the returned tables, i.e. they are
+    not sorted by order. Example:
+
+    s = stats(cube)
+    print("median is", s[1].median)
+    print("min is   ", s[1].min)
+------------------------------------------------------------
+

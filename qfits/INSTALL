@@ -1,0 +1,52 @@
+
+Installing qfits as an ANSI C library
+-------------------------------------
+
+	% ./configure
+	% make
+
+	That should do it. You should now have a library called
+	libqfits.a in the lib/ directory, and the include files
+	you need are in the include/ directory.
+
+	To review possible configure options, type:
+	% configure --help
+
+	To install this library system-wide, use:
+	% make install
+	
+	This will install the library in /usr/local. To change the
+	destination, use the --prefix option from configure.
+	Example: to install under /usr/local/qfits you would do:
+	% configure --prefix=/usr/local/qfits
+
+	If you want to perform basic tests, use:
+	% make check
+
+
+Using qfits from C++
+--------------------
+
+Compile the C library with a C compiler and link your C++ program
+against libqfits.a. It is not recommended to compile qfits with a
+C++ compiler. Although this probably works, C code is not C++
+code and you may run into trouble depending on the C++ compiler
+you have.
+
+
+Installing qfits as a Python module
+-----------------------------------
+
+	See python/README in this directory.
+
+
+Using qfits from other languages
+--------------------------------
+
+This used to be offered through a SWIG interface file, but
+is not supported any more. If you want to interface qfits to e.g.
+scripting languages like Perl or Tcl, check out SWIG at
+http://www.swig.org
+
+
+Mon Apr 15 13:17:42 CEST 2002

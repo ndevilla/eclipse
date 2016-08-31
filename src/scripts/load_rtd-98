@@ -1,0 +1,49 @@
+#!/bin/sh
+#\
+exec seqSh -f "$0" ${1+"$@"}
+
+#
+# This script receives the name of a FITS image on the command-line as
+# a first argument. If an RTD session is already running, the image is
+# displayed in it. Otherwise a new RTD is launched to display the
+# images. There is no need to start up an rtdServer beforehand.
+#
+# Author: P. Biereichel
+# Modified: N. Devillard
+
+#
+# Find out where is the file to load, because send_to_rtd needs
+# an absolute path name
+#
+
+if [file exists [pwd]/$argv] {
+	set filename [pwd]/$argv
+} else {
+	if [file exists $argv] {
+		set filename $argv
+	} else {
+		puts "cannot find file $argv: aborting RTD load"
+		exit 1
+	}
+}
+
+#
+# Get libraries from DFLOW_ROOT
+#
+
+lappend auto_path $env(DFLOW_ROOT)/lib/rtd
+set rtd_fd [connect_to_rtd]
+#
+# Cannot connect to an RTD? Launch one.
+#
+if {$rtd_fd == 0} {
+	puts "cannot connect to rtd: launching a new RTD session"
+	exec /vlt/dflow/bin/rtd $filename &
+} else {
+#
+# Display image in already existing RTD session
+#
+	puts "displaying $filename"
+	send_to_rtd $rtd_fd config -file $filename
+}
+

@@ -1,0 +1,772 @@
+
+Frequently Asked Questions about jitter
+Maintained by Yves Jung <yjung@eso.org>
+
+--
+
+FAQ Revised: Friday 23 September 2005 12:12:00
+
+
+Table of Contents
+
+
+1. General
+
+1.1. What is a FITS file?
+1.2. How do I reduce infrared data?
+1.3. Can you help me reduce my data?
+1.4. What is *jitter* doing exactly?
+1.5. What is a pipeline recipe exactly?
+1.6. May I use it for optical data?
+1.7. I heard some horrible things about jitter, what is true?
+
+
+2. Input and configuration files
+
+2.1. Are there examples of jitter.ini files?
+2.2. What are the default parameters valid for?
+2.3. How much memory do you recommend to have?
+2.4. How do I create the list of input files?
+2.5. Is it Ok to put several data sets in the same frame list?
+2.6. So how to I combine several data sets of the same field?
+2.7. How do I declare OBJECT and SKY frames?
+
+
+3. Sky estimation/subtraction
+
+3.1. Why all these dark crowns in output around extended objects
+or crowded regions?
+3.2. How good is the sky-subtraction?
+3.3. How do I submit new sky-subtraction methods?
+3.4. Where is the sky background estimation?
+3.5. How is the sky estimated in jitter+offset mode?
+
+
+4. Shift and Add
+
+4.1. How do I create an offset list?
+4.2. *jitter* fails to find any object for cross-correlation.
+What should I do?
+4.3. What if I am missing the first frame?
+4.4. What is the meaning of the returned value in parentheses, after the
+offset values?
+4.5. What kind of errors should be expected due to shift-and-add?
+4.6. Which method is used to shift the images?
+4.7. What is the 3d averaging algorithm?
+4.8. Why is the final frame bigger than any input frame?
+4.9. How are edge effects taken into account?
+
+
+5. Software-related questions
+
+5.1. jitter uses more RAM than I have!
+5.2. Is there a way to save intermediate data in case of machine crashes?
+
+
+6. Output FITS file format
+
+6.1. What is the meaning of the EXPTIME keyword?
+6.2. What are these HIERARCH ESO PRO keywords?
+
+
+
+1. General
+
+
+1.1. What is a FITS file?
+
+See the
+
+FITS support office home page
+
+at NASA for more informations about this file format.
+
+1.2. How do I reduce infrared data?
+
+Contact an infrared expert to get training. Reducing infrared data is
+no trivial task. The ISAAC pipeline tools are trying to make your life
+easier by automating some of the tedious tasks involved, but they do
+not replace the know-how of a trained astronomer. Read books, ask
+around you, read the ISAAC manual, etc. A good idea is usually to get
+training on infrared observing before actually submitting your
+proposals, or at least make sure you can get in touch with somebody
+who can help you process your data.
+
+1.3. Can you help me reduce my data?
+
+Short answer: NO
+
+Long answer: the eclipse team is dedicated to provide pipeline
+tools to the community to help them reduce their data. We are by no
+means an absolute reference about infrared data reduction.
+
+If you happen to find a bug or have comments about the methods offered
+by the pipeline, you are welcome to contact us:
+eclipse-team AT eso DOT org.
+
+If you have problems with your data, you are invited to contact the
+User Support Group in Garching to clarify points related to data
+acquisition.
+
+If you have problems understanding what should be done on your data,
+you need expert assistance. The eclipse team can unfortunately
+not provide that level of service. The User Support Group might give
+you hints. Reading all ISAAC documentation might be a good idea too.
+See the ISAAC Data Reduction Guide (from the ISAAC or eclipse
+home page).
+
+1.4. What is *jitter* doing exactly?
+
+Read the manual accessible from the eclipse home page.
+
+1.5. What is a pipeline recipe exactly?
+
+This question is answered in the general eclipse FAQ.
+
+See also question below: "I heard some horrible things about jitter, what
+is true?".
+
+1.6. May I use it for optical data?
+
+You can of course use this software on optical data. Actually, number of
+people have been using it as a shift-and-add tool for images taken in
+the visible bands. The most sensible thing to do in this case would be
+to disable the sky estimation in the ini file, but otherwise algorithms
+are unchanged.
+
+1.7. I heard some horrible things about jitter, what is true?
+
+*jitter* is a very complex tool that is aimed at performing the
+data reduction steps with as little user interaction as possible. In an
+ideal future, it should be able to modify itself its internal parameters
+depending on the input data, to get the best possible results. But that
+is still a dream! Today you need to first read the documentation
+carefully to be sure you understand correctly what the input parameters
+are. Then you need to take the time to study your own case and define a
+correct set of parameters for your problem. Then you can run
+*jitter* and see if the results you get are consistent. The best
+data reduction ever is almost never achieved on the first attempt.
+*jitter* is not (yet!) a magical tool that does everything for you.
+
+*jitter* is trying to be a good tool, not a good worker. There is
+no replacement so far for the attention an astronomer can have on a data
+set, and the scientific appreciation of the results. Consider this
+software as a transparent box that automates many tasks for you but has to
+be tailored to your data sets to produce the most efficient results.
+
+
+2. Input and configuration files
+
+
+2.1. Are there examples of jitter.ini files?
+
+Use the -g or --generate option. It will produce a
+default jitter.ini file in the current directory.
+
+2.2. What are the default parameters valid for?
+
+Section by section:
+
+
+	SkyEngine; 
+	
+	Default parameters are set for a slowly varying sky, i.e. the sky
+	can be considered constant in time over a range of
+	2*RejectHalfWidth+1 frames. If you are observing in J or H with a
+	total exposure time of 1 second per frame, it is reasonable to set
+	the half-width of the running filter to a high value. If you are
+	observing in K or Ks and have a long exposure time per frame, do not
+	use values above 2 or 3 as half-width, the assumption of a constant
+	sky in time is not valid anymore.
+	
+
+	Shift and add; 
+	
+	Default behaviour is to look for cross-correlating objects
+	automatically, locate a small number of objects around the center of
+	the first frame, and refine the inputs given by the FITS headers.
+	Frame shifts are by default performed by resampling using a
+	hyperbolic tangent kernel for interpolation. The only average
+	method is filtered, rejecting a user-specified number of min and max
+	pixels on each time line before averaging.
+	
+
+	Post-processing; 
+	
+	Default is to apply subtraction of the median from each row, to take
+	care of saturation effects. No image viewer is launched at the end
+	by default.
+	
+
+
+2.3. How much memory do you recommend to have?
+
+It depends on the amount of data you have to process. A typical SOFI or
+ISAAC batch of jitter files is usually made of about 60 frames. That
+translates to roughly 256 megs in input, thus about 512 megs
+total memory consumption during the process. If you can afford a
+gigabyte of RAM for such data sets, do it. If you have less
+memory, *jitter* will create its own swap pages as necessary to
+make the best use of what you have.
+
+For your information: *jitter* has been reported to reduce such
+SOFI batches on a Solaris station with only 32 megs of RAM (and loads
+of disk space), without any problem. The process is considerably
+slower, but it runs fine. I would say that 32 megs in RAM is the
+minimal amount to get a decent working *jitter* process. If you
+have a slow machine or little RAM, launch your processes at night with
+an at or cron command and get the results in the
+morning.
+
+Do not push it too far, though. The memory handling mechanism in
+eclipse is able to deal with far more memory than you truly
+have (RAM chips + swap space on disk) because of this internal swap
+page mechanism. But it cannot allocate infinite resources. You might
+still run out of memory in the following cases:
+
+
+	No more disk space available on E_TMPDIR.; 
+	Too many opened files at the same time.; 
+	Your memory consumption has reached the limit set by your
+	shell configuration (limit datasize).; 
+	You have exhausted all possible pointers on a 32-bit machine
+	(no kidding this has already happened).; 
+	The output file you are trying to create is bigger than the
+	maximum size for this filesystem.; 
+	Your kernel has run out of resources (no more pointers, size
+	of static structures reach a maximum, etc.).
+	...; 
+
+
+There are many things that might fail if you are trying to launch
+processing of huge data sets, and there is nothing that can be done to
+prevent that. If you really need to run *jitter* on very large
+numbers of frames, you are probably doing something wrong anyway. See
+below about combining several data sets together.
+
+2.4. How do I create the list of input files?
+
+The simplest way is to use 'ls'.
+
+
+% ls -1 *.fits > framelist.ascii
+
+
+Replace *.fits by the wildcards you need to describe the
+files you want to process, and framelist.ascii by any name you
+want, provided it is declared correctly in jitter.ini.
+
+Notice that ls is used with the option -1 (minus one), which
+requests a list of file names on a single column output.
+
+Beware!
+
+If your ls command is aliased to some exotic combination of
+options (most people alias ls to ls -F),
+the results of the previous commands may append some funny characters to
+the file names. Simple example: if your files have executable
+permission, and you aliased ls -F, all file names will have
+stars (*) appended, which will prevent jitter from finding
+the files. Notice that you can de-alias a command by preceding it with a
+backslash, i.e.
+
+
+% \ls -1 *.fits > myframelist
+
+
+If you want to do jitter+offset reductions, you will need to declare in
+second column the file type for each input frame (see next question).
+Hint: use dfits and fitsort -d to create
+this column output. For ISAAC, the simplest is to do:
+
+
+    % dfits *.fits | fitsort -d DPR.TYPE > framelist.ascii
+
+
+2.5. Is it Ok to put several data sets in the same frame list?
+
+Short answer: NO
+
+Long answer:
+
+Here is an example: you have observed the same field during several
+nights, getting in the end N data sets, each of them containing
+typically 30 to 60 frames. Since you want to get an image of the field
+that includes all of your observations, you are wondering if you could
+give all these files to *jitter* to magically re-combine them to
+a single image.
+
+Well... this is not possible. Several reasons:
+
+
+	The sky subtraction will not work. You will have in the input
+	list some consecutive frames taken widely apart in time. The sky
+	filtering algorithm assumes a smooth (if not continuous) sky
+	variation among frames, this breaks this assumption.; 
+
+	The offsets declared in the header will not match. The rule is
+	to declare every first frame in every batch being at offset (0,0).
+	Now if you observe the first frame in each batch, you will see
+	that they are not all exactly aligned, particularly if two data
+	sets have not been taken the same night. This will bias the offset
+	inputs and might lead to whole data sets not cross-correlating.
+	; 
+
+	Whatever machine you are running *jitter* on will most
+	likely run out of memory during the process. Just realize that you
+	have given the program several hundred megabytes to process, with
+	a total requested load of about 2 times the size of your input
+	data. Now check out how much memory you have on your machine and
+	be more realistic.; 
+
+
+2.6. So how to I combine several data sets of the same field?
+
+The simplest solution is to reduce each batch separately, since each
+batch is consistent with itself and *jitter* is made for that.
+You will get one reduced frame per batch. Now you can combine these
+together using again *jitter*, but this time you need to disable
+the sky estimation and provide your own frame offsets, or if you have
+an idea of the maximal offset range, activate the automatic offset
+finder with large enough search sizes.
+
+Agreed, this means that your frames will get interpolated a second
+time, but this should not be an issue. First, each reduced frame has
+already a quite high signal to noise ratio, which ensures that
+re-sampling will not act randomly. Second, there are by definition no
+very high frequencies in astronomical images because the acquisition
+system has been designed so. Re-sampling is not likely to cause
+artefacts with well-behaving signals like these.
+
+If you are really worried about re-sampling the frames a second time,
+you can always work on the offsets between all frames to make them
+consistent relative to the first one in the batch. You will have to
+find a way of subtracting the sky in each batch to produce
+correctly sky-subtracted frames. And then you can try putting all your
+frames into the same framelist... and hope that your machine does not
+crash due to memory/CPU load.
+
+2.7. How do I declare OBJECT and SKY frames?
+
+The input list format is the following: provide the input file names in
+first column, and optionally the file type in second column. Both
+columns are separated by blanks or tabs. The file type in second column
+identifies whether the frame is an OBJECT or a SKY. The
+definition is: if the word sky (case-insensitive) can be found in
+the character string identifying the file type, then the frame is a sky.
+Otherwise it is an object.
+
+Examples
+
+
+The following declares only objects:
+(no second column -> no sky string -> no SKY plane)
+
+--- begin
+frame1.fits
+frame2.fits
+frame3.fits
+frame4.fits
+--- end
+
+The following declares frame2.fits and frame4.fits as skies:
+(their second column contains a sky string)
+
+--- begin
+frame1.fits
+frame2.fits sky
+frame3.fits
+frame4.fits sky
+--- end
+
+Same for the following:
+
+--- begin
+frame1.fits   OBJECT_FRAME
+frame2.fits   SKY_FRAME
+frame3.fits   OBJECT_FRAME
+frame4.fits   SKY_FRAME
+--- end
+
+Same for the following
+(notice that the second column is case-insensitive to identify 'sky')
+
+--- begin
+frame1.fits   NGC9999 
+frame2.fits   NGC_SKY 
+frame3.fits   NGC9999 
+frame4.fits   skyFrame
+--- end
+
+
+With SOFI/ISAAC frames, you can get away with a simple:
+
+
+    % dfits *.fits | fitsort -d DPR.TYPE > framelist.ascii
+
+
+
+3. Sky estimation/subtraction
+
+
+3.1. Why all these dark crowns in output around extended objects
+or crowded regions?
+
+During sky background estimation, the aim is to remove all objects from
+the sky background, to get something which is as close as possible to
+the real sky value. If this rejection does not work too well, there will
+be star signal left in the background. This background is then
+subtracted from all input frames, which means a signal which is a little
+bit negative in case some object signal was left in the background.
+
+This will happen for example if you have crowded regions. The jitter
+movements are not sufficient (most will end up on object signal). For
+some pixels, most observed signal will be object signal, not sky. In
+that case it becomes impossible to filter reliably the sky out from this
+signal.
+
+Warning!
+
+*It is a terrible idea to observe a very crowded field or an
+extended object with a simple jitter pattern. Use instead
+jitter+offset, it has been designed for that purpose. Of course, you
+are then spending observation time to observe a blank sky, but it is
+the only reliable way to get rid of this strong signal in the infrared
+regime.
+*
+
+There have been many cases already of observers who did not want to
+loose any time observing such useless signals as the sky, and were
+totally unable to reduce their data. If you have not calibrated the
+sky background, you are left out with atmosphere models to estimate
+it, without any guarantee of result. You are advised not to use the
+'jitter' command in such cases.
+
+3.2. How good is the sky-subtraction?
+
+The sky-subtraction algorithm has been carefully studied by Angela
+Iovino. Her results are presented in a report available from the eclipse
+Web site.
+
+Have a look at
+
+jitter and photometry report
+
+3.3. How do I submit new sky-subtraction methods?
+
+On average, we receive one new suggestion about sky filtering methods
+per week (no kidding). On average, there is also one valid suggestion
+every thousand. If you really think you have the ultimate
+sky-filtering algorithm, it is recommended to go to your favourite
+programming environment and try out your method. If you can prove on a
+reasonable set of data that your method is better than the current
+one, pack everything into a decently written report and send it to us.
+
+An algorithm does not have to be *believed* but
+*demonstrated*.  Just as you would not publish a scientific paper
+where you only quote your opinions, you want to prove that your method
+is working in a given domain with some restrictions and specified
+parameters. If you just want to make suggestions, make sure they are
+properly documented and the result of a scientific study, not just
+your own belief.
+
+The next step is then to try to convince us of your method. There are
+too many suggestions about this topic for us to examine unsufficiently
+argumented ones, so be convincing!
+
+3.4. Where is the sky background estimation?
+
+The sky background estimation is given in the output QC PAF file.
+Have a look at your jittered_results_qc.paf file to get these
+measurements. Notice that there is no option any more to convert
+these values to other units, you will have to do it yourself. The given
+values are the measured average sky background values during sky
+estimation/subtraction.
+
+3.5. How is the sky estimated in jitter+offset mode?
+
+To summarize: a batch of jitter+offset frames usually means a small number
+of object and sky frames (10-20 at most). *jitter* will create a
+single sky plane by taking the median average of all sky frames in input,
+then subtract it from all object frames.
+
+This method is Ok to provide a quick-look on the data set (which is what
+the pipeline is meant to do), but insufficient in many cases. In K band,
+the sky sometimes varies too fast for this method to provide a reliable sky
+plane. You might want to produce several sky planes in this case, combining
+them with whatever 3d filter seems appropriate to get a good estimate. It
+is definitely recommended to measure sky background variations on the sky
+frames before deciding on a way to filter them.
+
+Once you have correctly subtracted out the sky, you can give the frames to
+*jitter* as you would with raw frames, disabling of course the sky
+estimation feature.
+
+
+4. Shift and Add
+
+
+4.1. How do I create an offset list?
+
+Everything you need to know about offset lists can be found by launching
+*jitter* with the --offset option.
+
+Here is one way to create simple offset lists. The easiest is to create it
+from header information. Using dfits, fitsort and awk you could do
+something like:
+
+
+% dfits *.fits | fitsort -d seq.cumoffsetx seq.cumoffsety
+
+
+That prints out the values of SEQ.CUMOFFSETX and SEQ.CUMOFFSETY for all
+FITS files in the current directory. Now if you want to create an offset
+list from this, you also need to add the plane number, which is usually
+just sequential from 1 to NPlanes. Using awk, you can easily add that by
+doing:
+
+
+% [...] | awk '{print NR-1,$2,$3}' > offsets.in
+
+
+[...] stands for the previous command, combination of dfits and
+fitsort.
+
+4.2. *jitter* fails to find any object for cross-correlation.
+What should I do?
+
+Try the following tricks:
+
+	Reducing the value of *AutoThreshold* will increase
+	detection. Careful: decreasing this value too much will end up
+	detecting noise and consequently increase the risk of false
+	matches.; 
+
+	It might be that no bright object is situated within the inside
+	box in the first frame. To overcome that, you can try to increase
+	the size of the possible box by decreasing the cross-correlation
+	search area or measure area. If your input offsets are coming from
+	the FITS header, reduce in the [ShiftAndAdd] section the
+	following values:
+	
+		OffsetSearchSizeX; 
+		OffsetSearchSizeY; 
+		OffsetMeasureSizeX; 
+		OffsetMeasureSizeY; 
+	
+	; 
+
+
+Last resort: if 'jitter' is still unable to find anything worth
+cross-correlating in your images, of if the objects it picks are not
+suitable for alignment (e.g. moving objects), you can provide your own
+list of objects in an ASCII file. See the corresponding sections in the
+jitter.ini file.
+
+4.3. What if I am missing the first frame?
+
+This should not change anything. jitter will identify the
+offsets between frames anyway, and the final reconstructed frame will
+be a union of all input frames (i.e. a bigger image than the input
+images).
+
+4.4. What is the meaning of the returned value in parentheses, after the
+offset values?
+
+The typical output from the offset matching routine is something like:
+
+
+from plane 1 to plane 18:       [-4.24  -54.42] (25.42)
+from plane 1 to plane 19:       [-57.44 -28.21] (33.38)
+from plane 1 to plane 20:       [ 1.96  45.27]  (1396.27)
+from plane 1 to plane 21:       [-18.35 -27.00] (35.13)
+from plane 1 to plane 22:       [-37.79 -44.23] (1396.86)
+from plane 1 to plane 23:       [37.00  41.88]  (25.61)
+
+
+The 'jitter' command determines offsets between frames by using a
+cross-correlation criterion. This measurement is searching for an
+offset between the reference and the candidate frame, that minimizes
+the sum of squared differences between the frames. The value printed
+out in parentheses along with the offset measurements is the minimal
+difference value found in cross-correlation. The smaller the value,
+the better the match between frames. The theoretical limit for this
+value is zero (perfect match) in the case of a frame that is shifted
+by an integer translation vector. There is no absolute reference to
+measure the "goodness of match" with this value, since it will depend
+on:
+
+
+	The fractional displacement amount: it will increase the
+	difference as displacements are closer to a half-pixel, and
+	decrease as they get closer to integer pixels.; 
+	The noise present in the image.; 
+	The amount of signal in the image.; 
+
+
+To have a visual indication of what this value is, you can have a look
+at the jitter algorithmic manual:
+
+http://www.eso.org/projects/dfs/papers/jitter99/node11.html
+
+The figure shows what a cross-correlation matrix looks like. The value
+returned in parentheses by the 'jitter' command is the lowest value of
+this matrix (the minimum of difference).
+
+As a rule of thumb, the values you get should all be more or less
+consistent. The lower the better, but the most important is to get
+variations in this distance measurement as small as possible.
+
+4.5. What kind of errors should be expected due to shift-and-add?
+
+There are several sources of errors in the whole process. Let us review
+them one by one.
+
+Cross-correlation is failing on a number of signals. If your image exhibits
+a strong periodical pattern, any replica in the pattern might be a good
+candidate for cross-correlation, introducing large matching errors in the
+output. A solution is to increase the size of the measurement area until
+the reference zone does not exhibit any periodical pattern.
+
+Another source of errors could be that the object used for
+cross-correlation reference is elongated (e.g. a galaxy). In the direction
+of elongation, any position is as likely to be picked as another. This
+would introduce systematic errors like an elongation of all stars in the
+final image. If you happen to be in such a case, try picking yourself the
+main object used for correlation, e.g. a bright star that can be seen on
+all frames. You could also increase the number of objects used in
+cross-correlation to compensate errors.
+
+Resampling is not completely harmless. A new signal is derived from the
+input signal, using some assumptions in the process like signal smoothness.
+If you happen to have very high frequencies (typically bad pixels) this is
+likely to disturb the neighbouring pixels and introduce some errors in
+final pixel values. If your signal behaves correctly and smooth enough, you
+should not have introduced any noise at all through resampling, though.
+
+The final stacking of images is also applying a 3d filter to remove the
+highest and lowest pixel values before summing up. This will systematically
+remove faint signals that appear on few frames, which might not be what you
+want to do. If you are interesting in keeping all input signal in the
+output, you should try linear averaging for the stacking and filter out bad
+pixels by yourself. Be aware that removing pixels systematically might be a
+cause of bias if your signal behaves irregularly.
+
+4.6. Which method is used to shift the images?
+
+The images are shifted using a high-order 2d separable interpolation
+algorithm. Integer shifts are to be avoided because of the aliasing
+they create.
+
+There is an article about image resampling, containing a fair
+description of what the interpolation scheme is. You should have a look
+at the ESO Messenger (issue 100 - July 2000). The article is called:
+Astronomical image resampling. You can download the July 2000 issue
+of the Messenger from the ESO Web site, at:
+
+
+http://www.eso.org/gen-fac/pubs/messenger/
+
+
+4.7. What is the 3d averaging algorithm?
+
+The final stacking is done by sorting out all pixels belonging to the
+same time line (z axis on the final cube), removing a user-specified
+number of min and max pixels, and averaging the rest. jitter
+used to offer various algorithms to do that, but this one is
+definitely the best. If you want to use a simple linear stack
+algorithm, you can set the reject numbers to 0,0. If you want to use a
+median filter, you can set the reject numbers so that only the middle
+value is kept.
+
+4.8. Why is the final frame bigger than any input frame?
+
+This change occurred in eclipse version 4. The default behaviour for
+the command is to try to reconstruct a union of all input frames. If
+you have small offsets between frames, this means that the final
+stacked image will be 10 to 15% bigger than the input frames. If you
+have large offsets between frames, the final image will grow
+similarly.
+
+4.9. How are edge effects taken into account?
+
+Pixels located on the edges of the final stacked image are by
+definition inconsistent with pixels located in the center, because
+they have seen less signal. To cope with this inconsistency, there are
+two methods:
+
+
+	Divide the final frame by the total number of input
+	frames.; 
+	Divide each pixel in the final frame by the number of
+	contributing pixels.; 
+
+
+The first method maintains a consistent signal-to-noise ratio over the
+frame, the second one maintains a consistent photometry for objects
+located on the edges. Version 3 and earlier of eclipse offered only
+the first method. Version 4 currently only offers the second method,
+an option might be added later on if the need arises.
+
+
+5. Software-related questions
+
+
+5.1. jitter uses more RAM than I have!
+
+Since version 3.0, eclipse uses a new (hopefully portable)
+memory allocation scheme. Without going into too many details, the
+library opens its own swap files in a temporary directory and tells
+the Operating System to use it as virtual memory.
+
+Some process monitoring tools such as top will report these
+temporary files (of litterally unlimited size) as memory use, thus
+providing a false information. Do not be alarmed by the quantities
+announced on top on systems such as Solaris and Linux, they
+are just bugged. *jitter* has been reported to show a memory use
+of more than 2 gigabytes (on a 32-bit system!) with no more than half a gig
+of memory space (RAM chips + swap space)... Do not always believe blindly
+your memory monitoring tools.
+
+5.2. Is there a way to save intermediate data in case of machine crashes?
+
+No.
+
+
+6. Output FITS file format
+
+
+6.1. What is the meaning of the EXPTIME keyword?
+
+According to the dictionary definition for ESO keywords:
+
+*
+EXPTIME provides the total integration time in seconds; it may have
+decimals. When the exposure is made of several periods, EXPTIME time is
+the sum of the exposure periods, and not simply the difference between
+end and start of exposure. Subintegrations, i.e. multiple exposures
+before a readout of the detector are described by the DIT and NDIT.
+*
+
+The reference is 
+The Data Interface Control Board document.
+
+This being said, the EXPTIME written in the output header by 'jitter' is
+the EXPTIME found in the first input header (NOT the sum of all
+EXPTIME values from all input files). This has been done upon
+request from the instrument scientist.
+
+6.2. What are these HIERARCH ESO PRO keywords?
+
+They are added to identify the frame as a pipeline product, in the ESO
+DataFlow environment. The only keywords you might be interested in are:
+
+
+PRO CATG         product category, identifies the frame as COADDED_IMG
+PRO DATE         date the jitter process was executed
+PRO DATANCOM     how many frames were combined to produce this one
+
+
+
+
+---

@@ -1,0 +1,29 @@
+.TH histog 1 "1 Oct 1997"
+.SH NAME 
+histog \- histogram plotting
+.SH SYNOPSIS
+.B histog
+[options] image.fits
+.SH DESCRIPTION
+.PP
+.B histog 
+computes the histogram of an image and plot it with gnuplot if installed
+and/or display the resulting histogram on stdout. You can specify a pixel
+range, the sample rate or if you want the histogam to be cumulative or not.
+.SH OPTIONS
+.TP
+.BI \-b " bins"
+To specify the number of bins used for the histogram. Default is the x-size
+of the image.
+.TP
+.BI \-g 
+Flag to activate the plotting.
+.TP
+.BI \-c 
+Flag to be used to have the cumulative histogram computed.
+.TP
+.BI \-i  " 'man max'"
+To specify a pixel value range for the histogram. All the pixels are used
+by default
+
+

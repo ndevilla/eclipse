@@ -1,0 +1,69 @@
+<html>
+<title>encircl man page</title>
+<body>
+<pre>
+Name
+       encircl - Encircled Energy Computation
+
+Synopsis
+       encircl [options] &lt;cubes&gt; &lt;parameters&gt;
+
+Description
+       encircl  computes  the encircled energy for every plane in a cube given
+       on command line. See ALGORITHM to know how  it  is  computed.   encircl
+       needs  to  be  given some parameters in order to work. These parameters
+       are the approximate position of the peak on which  the  user  wants  to
+       find  encircled  energy  radius, as well as the percentage of the total
+       energy for which the radius is wanted.
+
+Algorithm
+       For each image in each cube (candidate image), the following  algorithm
+       is applied:
+
+       1. Check the validity of the window.
+
+       2.  Find  the  position of the pixel of maximum intensity and re-center
+       the window on that pixel.
+
+       3. Calculate the energy encircled in the 100 % radius and  multiply  it
+       by the percentage of the total energy for which the radius is wanted.
+
+       4.  Calculate the encircled energy for every radius from 1 pixel to the
+       100 % radius and store the results in an array.
+
+       5. Look up the array to find the two entries whose values  are  nearest
+       to  that  corresponding  to  the  percentage  of interrest of the total
+       energy.
+
+       6. Use a linear interpolation to find more precisely  what  the  radius
+       is.
+
+Options
+       -p Plate Scale
+              Plate  scale in arc-seconds per pixel, for an output in arc-sec-
+              onds.
+
+       -r Radius
+              To override the hard coded size  of  the  100  %  energy  radius
+              (1.4").
+
+       -h half-size
+              To override the default 20 pix value of the window half size.
+
+Example
+       To  determine  the radius for which the encircled energy is 50 % of the
+       total encircled energy for an star whose energy we know to  be  located
+       in  a  window  of 42x42 pixels roughly centered on pixel 60,60 of image
+       star.fits with a plate scale of 0.1" we want to set the  100  %  energy
+       radius to 1.1" use:
+
+       encircl -h 21 -p 0.1 -r 1.1 star.fits 60 60 50
+
+Files
+       Files shall all comply with FITS format
+
+See Also
+       stcube, strehl
+</pre>
+</body>
+</html>

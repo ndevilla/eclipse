@@ -1,0 +1,287 @@
+.TH imgen 1 "13 Aug 1998"
+.SH NAME 
+imgen - image generation 
+.SH SYNOPSIS
+.B imgen
+[commands] 
+.SH DESCRIPTION
+.PP
+.B imgen
+creates images with a given pattern definition and according parameters.
+Since nearly all astronomical software packages have very extended image
+generation capabilities,
+.B imgen
+is deliberately limited to very simple patterns. See the commands below
+for pattern definitions.
+.PP
+In all options, whenever a reference is made to pixel coordinates, the
+FITS convention is used: the first image pixel is at coordinates (1,1)
+in the lower left corner of the image. Increasing x go right, increasing
+y go up.
+.SH IMAGE GENERATION SPECIFICATIONS
+.TP
+.BI \-x " value " \-y " value"
+to specify the generated image size (NAXIS1,NAXIS2). Defaults to 256x256.
+.TP
+.BI "\-b or \--bitsperpix " value 
+to request another pixel depth than the default one. The default output
+pixel type is chosen at compilation time: it is -32 if you did not
+request anything, -64 if you requested double precision format for
+internal pixel representation. Possible values correspond to pixel depth
+in the FITS definition: 8, 16, 32, -32, or -64.
+.TP
+.BI "\-o or \--output " name
+gives a name to the output image. Default is 'out.fits'.
+.TP 
+.BI \-S " name " or " " \--ref " name"
+gives the program a reference FITS file name which the output image will
+match in size. This option may not be used together with the -x or -y
+options.
+.SH THEORETICAL IMAGES
+.TP
+.BI "\-a or \--airy" " 'width max dx dy'"
+to create an Airy pattern, of given width (in pixels), maximum pixel
+value at the peak, and given dx, dy offset. The offset indicates where
+should the real peak be situtated from the center of the image. dx
+and dy are given in pixels from the center, axes comply with the FITS
+standard. Enclose the four required parameters into simple quotes.
+.TP
+.BI "\-g or \--gauss" " 'x-center y-center sigma'" 
+to create a gaussian pattern centered on (x-center, y-center) of standard
+deviation sigma.
+.TP
+.BI "\-l or \--lorentz" " 'x-center y-center intensity dispersion'" 
+to create a lorentzian pattern centered on (x-center, y-center) with
+intensity and dispersion strictly positive real numbers. the formula 
+used is pixel value equals intensity over one plus dispersion times
+the square of the distance of the given pixel to the center of the
+distribution (x-center,y-center).  
+.TP 
+.BI \-p " 'm1 m2 w0 dw pixelscale'"
+to generate a optical transfer function for a given telescope and camera
+configuration. Enclose the 5 requested parameters into simple quotes.
+The parameters are respectively:
+.PP
+The diameter of the primary mirror of the telescope in meters (m1).
+.br
+The diameter of the secondary mirror of the telescope in meters (m2).
+.br
+The central wavelength of observation (w0) in microns.
+.br
+The filter bandwidth (dw) in microns.
+.br
+The pixel scale on the sky (pixelscale) in arcseconds.
+.PP
+All these values can be defaulted to the ESO 3.6m la Silla telescope,
+which are:
+.PP
+m1 = 3.60 m
+.br
+m2 = 1.57 m
+.br
+w0 = 2.20 um
+.br
+dw = 0.30 um
+.br
+pixelscale = 0.05 arcseconds
+.PP
+An input value of -1 means: use a default value.
+.PP
+OTF's are square images, only the x-size parameter will be used to
+set the image size, the y-parameter being discarded.
+.PP
+An alternate form uses long options: --otf requires the OTF. Telescope
+parameters are set by --m1, --m2, --lambda0, --dlambda, and
+--pixelscale.
+.TP
+.BI \-t " 'm1 m2 w0 dw pixelscale'"
+to generate a theoretical PSF for a given telescope configuration.
+See option above, parameters are set as for OTF.
+.PP
+PSF's are square images, only the x-size parameter will be used to
+set the image size, the y-parameter being discarded.
+.PP
+An alternate form uses long options: --psf requires the PSF. Telescope
+options are as above for OTF: --m1, --m2, --lambda0, --dlambda and
+--pixelscale.
+.SH RANDOM PATTERNS
+.TP
+.BI \-r " 'U min max' " or " " \--urandom " 'min max'"
+to create an image containing noise having a uniform probability
+distribution in the pixel value interval
+.I [min,max].
+.TP
+.BI \-r " 'G mean sigma' " or " " \--grandom " 'mean sigma'"
+to create an image containing noise having a gaussian probability
+distribution centered around 
+.I mean
+and having a sigma value of
+.I sigma.
+The default value for
+.I sigma
+is 1/sqrt(2), it will be used if
+a negative value is provided.
+.TP
+.BI \-r " 'L mean dispersion' " or " " \--lrandom " 'mean disp'"
+to create an image containing noise having a lorentzian probability
+distribution centered around
+.I mean
+with a dispersion factor being
+.I dispersion.
+The default value of 1.0 will be used for dispersion if
+a negative value is provided.
+.SH BINARY PATTERNS
+.TP
+.BI "\-d or \--bdisk" " 'x-center y-center radius'"
+to create a
+.B binary
+disk, centered in the image at point
+.I (x-center, y-center)
+, having a
+radius of
+.I radius.
+Center coordinates and radius are not restricted to integer values.
+The disk is generated as white (1) on a black (0) background. The output
+can only be generated in FITS 8bit/pel format. A perfectly valid
+alternative long options is --bdisk 'x0 y0 r'.
+.TP 
+.BI "\-R or \--brect" " 'llx lly urx ury'"
+to create a 
+.B binary
+rectangle, of lower left corner situated in
+.I (llx, lly)
+and upper right corner situated in
+.I (urx, ury).
+The given corners are included in the rectangle. The rectangle
+is generated as white (1) on a black (0) background. The output can
+only be generated in FITS 8bit/pel format. A perfectly valid alternative
+long option is --brect 'llx lly urx ury'.
+.TP
+.BI "\-u or \--uniform " value
+to create a uniform (flat) image of given pixel value.
+.TP
+.BI "--poly2" " 'c0 c1 c2 c3 c4 c5'"
+This option will create an image of a 2nd degree polynomial in x and y.
+The coefficients given are in the following order:
+.br
+c[0] * x^2
+.br
+c[1] * y^2
+.br
+c[2] * x * y
+.br
+c[3] * x
+.br
+c[4] * y
+.br
+c[5] * 1
+.PP
+The coordinate system used for the polynomial is the one used by the
+FITS convention: pixel (1,1) is at the bottom left of the image, x-axis
+increasing from left to right and y-axis increasing from bottom to top.
+.TP
+.BI "\-P or --polygon " filename
+This option allows to create binary maps that contain polygons. This
+option expects a filename in input on the command-line. This file
+contains the definition of all the polygons that should be created in
+the binary map. The format is the following:
+.TP
+\(bu
+The polygon definition file is an ASCII file.
+.TP
+\(bu
+In this file, blank lines or lines starting with a hash (#) are simply
+ignored (comments).
+.TP
+\(bu
+Polygons are given by an ordered list of vertices. Each vertice is
+defined by a set of two coordinates in floating-point or integer
+format (both are supported). The polygon is drawn starting from the
+first point given in the list (from left to right), ending with the
+last point on the line and coming back to the first point.
+.TP
+\(bu
+Polygons must have at least 3 vertices. Special cases are not tested,
+e.g. when all points are aligned.
+.PP
+Here is an example of a polygon definition file, defining some
+rectangles in a 256x256 binary map:
+.PP
+#
+.br
+# Example of polygon definition file.
+.br
+#
+.br
+.br
+128 10 246 128 128 246 10 128
+.br
+10 10 90 10 90 90 10 90
+.br
+150 30 210 40 210 240 150 230
+.br
+20.4 217.25 82.31 233.98 68.67 195.2 32.0 175.6 14 190
+.br
+# end of file
+.PP
+To create the binary map from this file (assuming you named it
+poly.def), use:
+.PP
+% imgen -P poly.def
+.SH FILES
+.PP
+Input/output files shall all comply with FITS format.
+.SH EXAMPLES
+.PP
+To create an image of size 512x512 containing pixels having all the
+same pixel value: 19.97, named 'dummy.fits', and a pixel resolution
+of -32 (IEEE floating point values, usually the default pixel depth)
+you would type:
+.PP
+% imgen -u 19.97 -o dummy.fits -x 512 -y 512
+.PP
+To create an Airy pattern in an image of size 64x64, pixel depth 
+of 8 bits/pixel, centered at (-10,+15) from the image center (in this
+case on pixel 22,47), with a width of 11 pixels
+and a maximum pixel value of 1000.0, having the default output
+name 'out.fits', you would type:
+.PP
+% imgen -a '11 1000.0 -10 +15' -b 8 -x 64 -y 64 
+.PP
+To create an image containing a 2d gaussian signal centered on
+pixel 125,135 with a sigma being 5.0, an image of size of 256x256
+(default) and a pixel depth of -32 bits/pixel (default), named 'gauss.fits',
+you would type:
+.PP
+% imgen -g '125 135 5.0' -o gauss.fits
+.PP
+To create an image containing a 2d lorentzian signal centered on
+pixel 128,128, an image size of 256x256 (default), an intensity of
+50.0, a dispersion factor of 1.414, a pixel depth of -32 (default),
+and a default file name ('out.fits'), you would type:
+.PP
+% imgen -l '128 128 50.0 1.414'
+.PP
+To create an image containing uniform random noise with pixel values
+between -10.0 and 10.0, with all default values:
+.PP
+% imgen -r 'U -10.0 10.0'
+.PP
+To create an image containing noise with a gaussian probability density
+centered around 1.0, a sigma value of 6.0, with all default values:
+.PP
+% imgen -r 'G 1.0 6.0'
+.PP
+To create an image containing noise with a lorentzian probability density
+centered around 1.0, a dispersion value of 50.0, with all default values:
+.PP
+% imgen -r 'L 1.0 50.0'
+.PP
+To create an OTF for a telescope having a primary mirror of 8.2m diameter,
+a secondary of 2.4m diameter, at lambda0=2.2 microns, and dlambda 0.1 microns,
+and a pixel scale of 0.2 arcsec/pixel, with all default values:
+.PP
+% imgen -p '8.2 2.4 2.2 0.1 0.2'
+.SH SEE ALSO
+.PP
+.B ccube, setpix

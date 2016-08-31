@@ -1,0 +1,31 @@
+<html>
+<title>histog man page</title>
+<body>
+<pre>
+Name
+       histog - histogram plotting
+
+Synopsis
+       histog [options] image.fits
+
+Description
+       histog  computes  the histogram of an image and plot it with gnuplot if
+       installed and/or display the resulting histogram  on  stdout.  You  can
+       specify  a  pixel range, the sample rate or if you want the histogam to
+       be cumulative or not.
+
+Options
+       -b bins
+              To specify the number of bins used for the histogram. Default is
+              the x-size of the image.
+
+       -g     Flag to activate the plotting.
+
+       -c     Flag to be used to have the cumulative histogram computed.
+
+       -i ’man max’
+              To specify a pixel value range for the histogram. All the pixels
+              are used by default
+</pre>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<html>
+<title>deadpix man page</title>
+<body>
+<pre>
+Name
+       deadpix - bad pixel map handling
+
+Synopsis
+       deadpix [parameters]
+
+Description
+       deadpix  is  a  tool  to generate bad pixel maps from images of the sky
+       background in infrared. It can also be used to remove bad pixel contri-
+       butions in a frame by applying a bad pixel map on it.
+
+       Methods  offered  by this tool for bad pixel detection are not the best
+       ones, statistical studies of a twilight data set usually brings a  more
+       reliable  information  about pixel quality (see flat command). However,
+       these methods are still of some use when no other  data  are  available
+       for calibration.
+
+       The  skyvar method needs a sky cube, preferrably with many planes (&gt;20)
+       to observe meaningful statistical behaviours.
+
+       The median method detects spikes in an image, it needs in input a small
+       number (&lt;10) of flat frames.
+
+       The  cleaning  algorithm  only requires a valid pixel map and a cube to
+       clean out.
+
+Detection Algorithms
+       Two methods are implemented for bad pixel detection. They both make use
+       of sky images.
+
+       First method : sky variations statistics (skyvar method)
+
+       Let’s  compute for each pixel its standard deviation along time.  If we
+       plot a histogram of these standard deviations, we see a gaussian-shaped
+       function  that  represents the response to the sky signal. We decide to
+       throw away all pixels which response is too  low  (dead)  or  too  high
+       (noisy)  by  rejecting  all  pixels  out of a central +/- sigma_width/2
+       interval on the histogram.  Default sigma_width is 3, it can be changed
+       by feeding a new sigma width through the -s option.
+
+       example:
+       &gt; deadpix -d --skyvar --sigma 4 --sky skycube.fits
+
+       Second method : median filter detection (median method)
+
+       This  method  does  not  make  use  of  temporal information, by merely
+       observes each image independently. If we  assume  that  the  signal  is
+       smooth enough, bad pixels are spikes easily found by computing the dif-
+       ference between the image and its median filtered version, and  thresh-
+       olding it. All spikes are then detected. This is not as strong as using
+       the temporal information, but this is the  only  way  when  not  enough
+       images  are  present.   Default  threshold  is fixed to 10.0, it can be
+       changed by using the -m option. This threshold  is  given  directly  in
+       pixel values.
+
+       example:
+       &gt; deadpix -d --median --threshold 15 --sky skyplanes.fits
+
+Cleaning Algorithm
+       The  algorithm  used to clean out a plane from bad pixels is simple. It
+       just replaces bad pixel positions by an average of the valid pixels out
+       of the 8 closest neighbours. If no value is available, the pixel is set
+       to null.
+
+       example:
+       &gt; deadpix --clean --in toclean.fits --pixmap badpixmap
+
+Parameters
+       First, choose between dead pixel  detection  and  dead  pixel  cleaning
+       mode.  This is done by activating either --detect/-d or --clean/-c com-
+       mand-line options.
+
+       Detection mode: --detect or -d
+
+       --skyvar or -m skyvar
+              This forces the use of the sky variation method  for  bad  pixel
+              detection.  An expected parameter is then --sigma.
+
+       --sigma value or -s value
+              This specifies the sigma threshold for the sky variation method.
+              Default value is 3.0.
+
+       --median or -m median
+              This forces the use of the median method for  bad  pixel  detec-
+              tion. An expected parameter is then --threshold.
+
+       --threshold thr or -t thr
+              This  specifies  the  median  threshold  for  the median method.
+              Default value is thr=10.
+
+       --sky name or -S name
+              Specifies the name of the file which contains the sky planes  to
+              work with. This is used by both detection methods.
+
+       Cleaning mode: --clean or -c
+
+       --in name or -i name
+              Specifies the name of the input file to clean out.
+
+       --out name or -o name
+              Specifies  the  name  of  the  output  file  to  create. This is
+              optional, default naming scheme for input files named *.fits  is
+              *.cln.fits.
+
+       Parameters common to both modes
+
+       --pixmap name or -p name
+              This  specifies the name of a pixel map. In detection mode, this
+              is an output since the goal of the detection is to produce a bad
+              pixel  map.  In cleaning mode, this is an input which is used to
+              clean out other files.
+
+Files
+       Input files shall all comply with FITS format.  Pixel maps are in 8 bit
+       FITS format.
+
+       In  a bad pixel map, good pixels are set to 1, bad pixels are set to 0.
+       This can also be found in bad pixel map FITS headers, where the follow-
+       ing keywords are written:
+
+       GOODPIX = 1
+       BADPIX  = 0
+
+Notice
+       Pixel  maps are in 8 bits signed FITS format. They can be easily viewed
+       that way.
+
+See Also
+       flat
+
+Author
+       N. Devillard -- ESO
+</pre>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<html>
+<title>eclipse man page</title>
+<body>
+<pre>
+Name
+       eclipse - (ESO C Library for an Image Processing Software Environment)
+
+Description
+       eclipse is a general FITS image processing library written in ANSI C.
+
+History
+       Initially  written  for  Adonis,  eclipse  has since grown to a general
+       multi-purpose FITS handling utility. It has been reported to be used on
+       many telescope workstations and observatories.
+
+       Today,  eclipse is used in ESO to implement fast image processing algo-
+       rithms for the VLT infrared instruments.
+
+Overview
+       eclipse offers an  open  environment  for  image  processing  algorithm
+       developments.   At  the  highest level, only Unix commands are offered,
+       giving users the possibility to call the algorithms embedded  into  the
+       library. One level below is a library of several hundred functions tak-
+       ing care of many aspects of astronomical image processing.  Users  will
+       want  to  use only Unix commands to process their data, programmers and
+       algorithm developers will want to peek into the libraries to  implement
+       their own routines.
+
+       All  of these procedures are running without user interaction, which is
+       typical of a pipeline, number-crunching approach.
+
+       Notice that a link to off-line data processing softwares is  essential.
+       eclipse  does not provide any complex post-processing algorithm such as
+       deconvolution, nor does it contain any image or data displayer.  Global
+       data  analyzers such as MIDAS provide the full range of functionalities
+       needed for evolved post-processing and analyses; eclipse is to be  used
+       as a pre-processor, a signal processing engine.
+
+       Since  version 4.2, all FITS read/write functions have been moved  away
+       from eclipse to give birth to a small, efficient and  easy-to-use  FITS
+       io library: qfits.  eclipse needs and is distributed with qfits
+
+Adonis
+       A set of scripts and Unix commands has been especially designed to take
+       care of most basic data reductions for Adonis. This  has  been  set  up
+       during August 1996 in la Silla, with h.PP from observers, telescope and
+       Adonis team.
+
+       The following set of operations has been automated:
+
+           flat-field creation
+           bad pixel detection
+           sky extraction from data cube, averaging, and subtraction from
+           object frames
+           average of the result
+
+       There is a preparation phase, during which the observer has to identify
+       their  files according to their logbook, and sort them out, preferrably
+       in separate directories. It is then possible to design quickly  a  Unix
+       script to launch a unique reduction command on all directories, and get
+       cleaned data in a very short time.
+
+       Since version 2.0, a new set of commands is available for Adonis Fabry-
+       Perot mode. This work has been validated in Summer 1997 in la Silla, by
+       Christian Drouet d’Aubigny, with h.PP from Patrice Corporon  and  David
+       le Mignant.
+
+Sofi/Isaac
+       SOFI and ISAAC are two ESO infrared instruments. SOFI is working on the
+       NTT in la Silla, ISAAC is installed on the UT1 telescope  of  the  VLT.
+       These  instruments are mostly used in jitter mode, which requires dedi-
+       cated optimized algorithms for data processing. Some commands have been
+       written  to handle pipeline data processing, they are integrated in the
+       VLT data flow system as data reduction engine for  these  modes,  as  a
+       complement  to  on-line MIDAS. Both imaging and spectroscopic modes are
+       supported for ISAAC.
+
+Naco
+       NACO is an infrared instument that work with an adaptive optic  system.
+       The  data  reduction  is  similar  as the one used for ISAAC. Reduction
+       recipe have been developed with the ISAAC  experience  and  adapted  to
+       this  new  instrument. Support for the NACO instrument has been present
+       in eclipse since version 4.0
+
+License
+       eclipse is covered by the GNU public general license, which makes  pos-
+       sible  to distribute it on the World Wide Web. It should be included in
+       future MIDAS distributions as a contribution for pipeline processing.
+
+       I would like to thank all people participating in the  High  Resolution
+       Data  Reduction  Working  Group  for  their  kind  h.PP and patience in
+       detailing the secrets of Infra-red data processing
+
+       Special thanks to our friends in la Silla, Patrice Corporon  and  David
+       le Mignant, for their invaluable h.PP.
+
+       Most  eclipse  documentation  is available on-line on the ESO server at
+       the following address:
+
+       http://www.eso.org/eclipse
+
+Internal Pixel Representation
+       A note about the internal pixel representation:
+
+       The convention in use throughout eclipse is to work with single  preci-
+       sion  pixels internally, i.e. all pixel buffers are float *, which lim-
+       its the precision to 32 bits in IEEE  floating  point  format  for  all
+       pixel operations. This is usually enough for most data reduction proce-
+       dures, and gains time in terms of memory use.
+
+       You may want however to work with double precision pixels, to  increase
+       computation  accuracy.  Know that the memory use in much more intensive
+       in this case, the most probable case  being  that  all  cubes  will  be
+       swapped  to  disk for any pixel operation involving several planes of a
+       cube, the amount of time used for the same operation  being  more  than
+       twice  the  one  needed with single-precision pixels: disk accesses are
+       usually a factor 1000 slower than memory accesses.
+
+       Since version 2.1, it is possible to work with pixels stored as  double
+       precision  numbers.  The  FITS  interfaces  have been upgraded to allow
+       input and output in FITS -64 IEEE double format, and the internal pixel
+       representation may be double, on user request.
+
+       This change from single to double precision is not dynamic but can only
+       be requested at compilation time. The procedure to  follow  to  compile
+       eclipse  with double precision pixels is described in the INSTALL file.
+
+Availability
+       eclipse is distributed on the WWW under the following URL:
+       http://www.eso.org/eclipse
+</pre>
+</body>
+</html>

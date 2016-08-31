@@ -1,0 +1,78 @@
+<html>
+<title>collapse man page</title>
+<body>
+<pre>
+Name
+       collapse - collapse an image along X or Y
+
+Synopsis
+       collapse [options] &lt;in&gt; [out]
+
+Description
+       collapse  is used to create a 1D signal from an input image, collapsing
+       pixels along the X or Y direction. The default collapsing method  is  a
+       simple  sum of all pixels along lines or columns. A median collapse (-m
+       option) is done by keeping only the median  value  for  each  processed
+       line  or  column.  A  number  of  lowest/highest pixels can be rejected
+       before the median is computed, see the -r option.
+
+       The output is an ASCII file containing two columns.  The  first  column
+       contains  the X or Y pixel position, and the second column contains the
+       collapsed value. The output file name is either provided  on  the  com-
+       mand-line as the last argument, or will be built as:
+       If the input name is inputname.fits, the output name is inputname_line.
+
+       You can also request the output to be a FITS file, i.e.  a  FITS  image
+       with a single line. See the -f or --fits option.
+
+Options
+       -d or --dir x | y
+              Collapse  along  the  X  or  Y direction. Default is to collapse
+              along the Y direction, i.e. the output is a line of pixels, each
+              pixel  being computed as a collapse of the column it belongs to.
+
+       -f or --fits
+              Save the result to a FITS file containing a single line, instead
+              of an ASCII file. This is useful as input if you want to ’uncol-
+              lapse’ the image.
+
+       -g or --gnuplot
+              Activate a gnuplot output. This option will only work if gnuplot
+              is  installed for your user account and accessible from the com-
+              mand-line.
+
+       -m or --median
+              Collapse the image with a median method, rather  than  a  simple
+              sum.
+
+       -r or --reject ’lo hi’
+              Rejects  the  ’lo’  lowest  and ’hi’ highest pixel values before
+              applying a median collapse. Default for these rejection  parame-
+              ters is zero.
+
+       -u or --uncollapse width
+              This option actually performs a "reverse" collapse and will cre-
+              ate a 2d image from a single line or column. This is  useful  to
+              subtract  out from the initial image some row or column-specific
+              defects.  With this option, the input file must be a FITS  file,
+              which  means  that  you should have used the -f or --fits option
+              previously to save the collapsed image to a one-row or  one-col-
+              umn  FITS image. The specified width indicates the size you want
+              to give to this new image, in the newly created direction.  This
+              option is incompatible with all others.
+
+Examples
+       Collapse  the  image  ’im.fits’  along Y, with simple sum. Keep default
+       output name ’im_line’.
+       collapse im.fits
+
+       Collapse the image ’im.fits’ along  X,  with  median  collapse  without
+       rejection, keep default output name ’im_line’:
+       collapse -d x -m im.fits
+
+       Collapse  the  image  ’im.fits’ along X, with median collapse rejecting
+       the 80 low and 90 high pixels, naming the output ’coll_line’:
+       collapse -d x -m -r ’80 90’ im.fits coll_line
+</pre>
+</body>
+</html>

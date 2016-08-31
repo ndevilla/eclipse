@@ -1,0 +1,29 @@
+<html>
+<title>3color man page</title>
+<body>
+<pre>
+Name
+       3color - 3 color combination
+
+Synopsis
+       3color &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;outname&gt;
+
+Description
+       3color  combines  three  FITS  images  of equal size to a single 24 bit
+       image in PPM format. All input files are first scaled to 256 gray  lev-
+       els before conversion to a single 24 bit image file.
+
+       Example:
+       &gt; 3color h2.fits feII.fits brg.fits orion.ppm
+
+Options
+       None
+
+Files
+       Input  files  shall  all comply with FITS format. The output file is in
+       PPM (Portable PixMap) format, which should be fairly easy to convert to
+       any  kind of more convenient image format for export. As PPM images are
+       portable, they are bulky and usually not suitable for export.
+</pre>
+</body>
+</html>

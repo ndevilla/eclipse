@@ -1,0 +1,75 @@
+.TH stcube 1 "28 Feb 2001"
+.SH NAME
+stcube \- cube statistics
+.SH SYNOPSIS
+.B stcube
+[options] <cubes...>
+.SH DESCRIPTION
+.PP
+.B stcube
+gives basic statistics about each plane in a cube. It is used to have a
+quick look at what kind of data is in the cube.
+.PP
+The display looks like :
+.PP
+#--------------------------------------------------
+.br
+# FILE stdstar_check.fits
+.br
+# PLANE  MIN   MAX      MEAN      MEDIAN    STDEV
+.br
+  0001   -287  9709.33  15.0937   0.833328  228.504
+.br
+#--------------------------------------------------
+.PP
+For each plane:
+.PP
+MIN is the minimum value.
+.PP
+MAX is the maximum value.
+.PP
+MEAN is the average pixel value.
+.PP
+MEDIAN is the median pixel value.
+.PP
+STDEV is the standard deviation.
+.PP
+There is one display for each FITS file given on command line.
+.B stcube
+accepts jokers on command line :
+.br
+> stcube *.fits
+.SH OPTIONS
+.TP
+.BI "\-b or \--badpixmap" " filename"
+give a bad pixel map to take into account when computing statistics on
+the cube.
+.TP
+.BI "\-z or \--zone" " 'llx lly urx ury'"
+To compute statistics only on a rectangular zone in the images. The zone
+is specified by indicating the coordinates of the lower-left and
+upper-right corners of the rectangle. Borders are inclusive.
+The coordinate system is the one used by FITS, namely that the lower left
+pixel in the image is labelled (1,1), x-axis increasing from left to right,
+y-axis increasing from bottom to top.
+.TP
+.BI \-s " or " \--stdev " <name>"
+To compute a standard deviation frame (only), with name <name>.
+This mode of
+.B stcube
+accepts only one input file name, which should correspond to the name
+of a 3d FITS file or a valid ASCII list (i.e. a data cube). The input
+cube is processed to obtain a frame that is giving the standard
+deviation of all pixels along time. If several input names are
+provided, only the first one will be taken into account.
+.SH EXAMPLES
+.PP
+To compute the standard deviation frame named 'stdev.fits'
+from a cube named 'cube.fits', you would use:
+.br
+> stcube --stdev stdev.fits cube.fits
+.PP
+To compute statistics on the lower left quadrant only of a
+256x256 image, you would use:
+.br
+> stcube --zone '1 1 128 128' image.fits

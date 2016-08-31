@@ -1,0 +1,49 @@
+.TH catcube 1 "18 May 1998"
+.SH NAME
+catcube \- cube/image concatenation to one cube 
+.SH SYNOPSIS
+.B catcube
+[options] [-o output] <cube1> [cube2] ... [cube n]
+.SH DESCRIPTION
+.PP
+.B catcube
+creates an output cube that is sum on the z-axis of all other cubes
+given on command line in order of appearance from left to right. e.g.
+.br
+.B catcube
+\-o outcube cube.001 cube.002 image.001 cube.003
+.br
+will create an output cube 'outcube' with planes consisting of planes
+cube.001 first, then planes of cube.002, then image.001, then cube.003.
+All planes shall have the same size (width, height). The pixel depth of
+the output cube is the most restrictive, i.e. the one which needs the
+highest amount of bits.
+.B catcube
+accepts jokers on command line :
+.br
+\> catcube -o output.fits ADO*.fits
+.PP
+The default output name is 'cat.fits'. The \-o option may be specified
+anywhere on the command line. Example: the following lines are strictly
+equivalent:
+.PP
+.B catcube
+f0001 f0002 -o output.fits f003 f004
+.PP
+.B catcube
+-o output.fits f0001 f0002 f003 f004
+.PP
+.B catcube
+f0001 f0002 f003 f004 -o output.fits
+.SH FILES
+.PP
+Input files shall all comply with FITS format
+Output file pixel type is the highest input pixel type encountered.
+.PP
+The original FITS header  of the first given FITS file on command line
+is conserved along, except for the following keywords:
+NAXIS, NAXISn, BITPIX, BSCALE, BZERO, which are related to the
+newly created file.
+.PP
+HISTORY keywords are appended to the FITS header to indicate the eclipse
+process modifications.

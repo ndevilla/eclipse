@@ -1,0 +1,16 @@
+# CATALOG
+# eclipse IR standard star catalog: raw database
+# 
+# $Id: Conica,v 1.5 2002/12/17 10:04:48 yjung Exp $
+# $Author: yjung $
+# $Date: 2002/12/17 10:04:48 $
+# $Revision: 1.5 $
+#
+# This file contains stars provided by Wolfgang Brandner
+#
+# Name   | Ra          |  Dec        | Sp | J      |   H    |   K    | Ks | L  | M  | L' | M'
+Feige16  | 01 54 34.6  | -06 45 59.6 | A0 | 12.338 | 12.334 | 12.339 | 99 | 99 | 99 | 99 | 99
+GD50     | 03 48 50.1  | -00 58 30.9 | A0 | 14.761 | 14.865 | 14.983 | 99 | 99 | 99 | 99 | 99
+#
+# end of file
+#

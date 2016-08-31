@@ -1,0 +1,351 @@
+
+Protected FITS library (pfits)
+------------------------------
+
+
+Overview
+--------
+
+This library provides a layer of abstraction around FITS
+headers for a finite list of known and supported instruments. It
+allows applications to query keys into FITS headers without
+having to care about keyword name or convention changes, history
+support, or algorithms needed to query header informations.
+
+
+
+
+Description
+-----------
+
+Here are some true cases that happened with ISAAC:
+
+1. History support
+
+	During a first period, the instrument writes a frame type
+	information into a keyword called DET.FRAME.TYPE. During
+	another period, the instrument calls this keyword
+	DET.FRAM.TYPE (missing E at the end of FRAME), so:
+
+	DET.FRAME.TYPE becomes
+	DET.FRAM.TYPE
+
+
+2. Meaning changes
+
+	During a first period, the instrument considers the exposure
+	time (stored in EXPTIME) to be the total exposure time spent
+	on sky. During a second period, the meaning of exposure time
+	is changed to be the time spent on sky per frame.
+
+	EXPTIME = 3600  becomes
+	EXPTIME = 60
+
+	for data taken in the same configuration.
+
+
+3. Algorithmic support needed.
+
+	The instrument does not store the filter it uses into a FITS
+	keyword, but stores instead the full instrument optical
+	configuration. To determine which filter is in place, several
+	keywords related to instrument configuration have to be
+	parsed and summarized before a filter name can be deduced.
+	Example:
+
+	TPL.ID       = 'SWAutoJitter'
+	INS.FILT1.ID = 'open'
+	INS.FILT2.ID = 'J'
+	INS.FILT3.ID = 'open'
+	INS.FILT4.ID = 'L'
+	
+	To get which filter was used for observation, the instrument
+	mode has first to be determined, and depending on the mode a
+	set of two keywords have to be read. Filter wheels declared
+	as 'open' let the light through, otherwise a filter ID is
+	given.
+
+
+
+Usage
+-----
+
+This library offers a single function call:
+
+	char * pfits_get(char * ins, char * filename, char * key);
+
+
+The only necessary fields are:
+
+	- filename: the name of the FITS file you want to get your
+	  information from.
+	- key: the name of the keyword you are looking for.
+
+You can provide the instrument name if you know it. If you do
+not, provide NULL and pfits_get() will try to identify the
+instrument that created the file called 'filename' by looking
+into its FITS header. If no instrument can be identified or the
+given instrument ID does not match any known ID, the provided key
+is used to search the file's FITS header.
+
+Possible values for keys are:
+
+	- Legal FITS keywords (8-char).
+	- HIERARCH keywords in complete form, e.g. HIERARCH ESO DET DIT
+	- HIERARCH keywords in shortFITS, e.g. DET.DIT
+	- Valid symbols for a given instrument.
+
+pfits_get() is case insensitive on the key, so the following are all
+equivalent:
+
+	s = pfits_get(NULL, "a.fits", "HIERARCH ESO DET DIT");
+	s = pfits_get(NULL, "a.fits", "hierarch eso det dit");
+	s = pfits_get(NULL, "a.fits", "HIERARCH ESO det dit");
+	s = pfits_get(NULL, "a.fits", "DET.DIT");
+	s = pfits_get(NULL, "a.fits", "det.dit");
+
+and for ISAAC, this is also equivalent to:
+
+	s = pfits_get("isaac", "a.fits", "dit");
+	s = pfits_get("isaac", "a.fits", "Dit");
+	s = pfits_get("isaac", "a.fits", "DIT");
+
+See below for a description of what are known symbols.
+
+
+Known symbols for instruments
+-----------------------------
+
+In the case of a keyword changing name, meaning, or needing an
+algorithm to be retrieved, the preferred method to retrieve a
+FITS key is to use its symbolic name. Every instrument declares
+to pfits a list of recognized symbolic names and the helper
+function to call to get this key.
+
+Example: in the case of ISAAC, the defined symbols are declared
+in pfits/src/key_isaac.h
+This file contains a list such as:
+
+static keyfits keylist_isaac[] = {
+    {"airmass_start",         0, isaac_get_airmass_start},
+    {"airmass_end",           0, isaac_get_airmass_end},
+    {"arcfile",               0, isaac_get_arcfile},
+    {"chopping_cycle",        0, isaac_get_chopping_cycle},
+	[...]
+
+
+On the left-hand side are the declared symbols.
+The central value (0) has no meaning to the pfits customer.
+The right-hand side declares the helper function that is used to
+retrieve the symbol.
+
+When you call pfits_get() in an ISAAC context and request the key
+"airmass_start" to be retrieved, pfits_get() will call the helper
+function called isaac_get_airmass_start() on the file to retrieve
+the information. This function is implemented in key_isaac.c and
+only visible to pfits.c.
+
+
+Helper functions
+----------------
+
+A helper function is dedicated to the query of one given piece of
+header information. It can be querying one or several keywords,
+may perform some computations or take decisions based on the
+information it got, and ultimately returns to its caller a
+character string containing the final value, or NULL if it
+failed. Helper functions all have the same prototype:
+
+	char * instrument_get_key(char * filename);
+
+Examples:
+
+	char * isaac_get_airmass_start(char * filename);
+	char * isaac_get_airmass_end(char * filename);
+	char * isaac_get_arcfile(char * filename);
+	...
+
+Let us demonstrate a concrete application to solve the initial
+problems described above in introduction. Following is
+pseudo-code only meant to show the concept:
+
+1. Keyword name changes
+
+char * isaac_get_frametype(char * filename)
+{
+	s = qfits_query_hdr(filename, "DET.FRAME.TYPE");
+	if (s==NULL) {
+		s = qfits_query_hdr(filename, "DET.FRAM.TYPE");
+	}
+	return s ;
+}
+
+
+2. Keyword meaning change
+
+char * isaac_get_exptime(char * filename)
+{
+	exptime = qfits_query_hdr(filename, "EXPTIME");
+	dateobs = qfits_query_hdr(filename, "MJD-OBS");
+
+	if (dateobs < 01Jan2000) {
+		exptime = exptime / 60.0 ;
+	}
+	return exptime ;
+}
+
+
+
+3. Keyword not existing directly in header, but retrieved through
+an algorithm:
+
+char * isaac_get_filter(char * filename);
+{
+	insmode = qfits_query_hdr(filename, "INS.MODE");
+	if (insmode == "short wavelength") {
+		filt1 = qfits_query_hdr(filename, "INS.FILT1.ID");
+		filt2 = qfits_query_hdr(filename, "INS.FILT2.ID");
+	} else {
+		filt1 = qfits_query_hdr(filename, "INS.FILT3.ID");
+		filt2 = qfits_query_hdr(filename, "INS.FILT4.ID");
+	}
+
+	if (filt1!="open") {
+		filter = filt1 ;
+	} else {
+		filter = filt2 ;
+	}
+	return filter ;
+}
+
+
+
+PAF support
+-----------
+
+
+Because of helper functions, support can easily be added for PAF
+files. A helper function that needs to work upon both FITS and
+PAF files would look like:
+
+char * ins_get_key(char * filename)
+{
+	char * s ;
+
+	s = NULL ;
+	if (is_paf_file(filename)) {
+		s = paf_query(filename, "...");
+	} else if (is_fits_file(filename)) {
+		s = qfits_query_hdr(filename, "...");
+	}
+	return s 
+}
+
+This is actually implemented for almost all ISAAC helper
+functions.
+
+
+
+
+Algorithm
+---------
+
+
+The pfits_get() algorithm in pseudo-code is:
+
+	- Identify instrument associated to given instrument tag.
+	- If instrument can be found, use associated helper function
+	  to retrieve the requested key, otherwise continue.
+	- Try to identify instrument ID by looking into the provided
+	  FITS file. If instrument can be found, use associated
+	  helper function to retrieve the requested key, otherwise
+	  continue.
+	- No instrument ID was found: cannot use a helper function.
+	  Query the file for the given key.
+
+
+To identify the given instrument ID, a case-insensitive string
+comparison is performed between the given string and a list of
+known instrument strings.
+
+To identify if the requested key corresponds to a known symbol, a
+hash value is computed on the string and compared to every symbol
+in the identified instrument list. If a match is found, the
+corresponding helper function is called.
+
+
+Recommended use
+---------------
+
+Let us demonstrate the use of this module on a typical case.
+We want to protect the search for a keyword initially called
+"DATA" in the header. This is a regular 8-char FITS keyword.
+The pfits_get() call looks like:
+
+	value = pfits_get(ins, filename, "DATA");
+
+Later on, this keyword is changed to a hierarchical keyword
+called HIERARCH ESO INS DATA. We need to implement a helper
+function now:
+
+char * ins_getdata(char * filename)
+{
+	char * s ;
+
+	s = qfits_query_hdr(filename, "DATA");
+	if (s==NULL) {
+		s = qfits_query_hdr(filename, "INS.DATA");
+	}
+	return s ;
+}
+
+A new entry in the 'ins' table has to be created, namely:
+
+[...]
+	{ "data", 0, ins_getdata },
+
+
+pfits_get() will now hit the 'data' string when looking up known
+symbols and call the helper function instead of making a direct
+query to the header. We can still leave the pfits_get() call
+untouched in the main code: the FITS request is protected by
+pfits_get().
+
+
+
+
+Implementation issues
+---------------------
+
+The string returned by pfits_get() is guaranteed to be statically
+allocated within the pfits_get() function itself, i.e. there is
+no need to free it and no possibility to modify it from outside
+the function. To allow calling the function several times within
+the same function call, a static rotating string buffer has been
+installed in pfits_get(). This enables something like:
+
+
+	printf("naxis1: %s\n"
+	       "naxis2: %s\n",
+		   pfits_get("isaac", "a.fits", "naxis1"),
+		   pfits_get("isaac", "a.fits", "naxis2"));
+
+This internal static buffer limits side-effects on this function
+call, making the returned string a little more robust than usual
+static strings inside functions. However, you should not rely on
+the returned string to be valid for too long since you have no
+way of knowing how many functions can be calling it from within
+lower levels.
+
+Known symbols for an instrument are stored into a static area. To
+enable faster string search, all strings are hashed. This hashing
+is computed when the module initializes itself. These values
+could be precomputed but that may raise portability and
+maintenance issues.
+
+
+
+N. Devillard
+Fri Mar 15 13:57:49 CET 2002
+
+

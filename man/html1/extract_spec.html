@@ -1,0 +1,40 @@
+<html>
+<title>extract_spec man page</title>
+<body>
+<pre>
+Name
+       extract_spec - extract a spectrum
+
+Synopsis
+       extract_spec -i infile [options] [-o outfile]
+
+Description
+       extract_spec extracts an horizontal spectrum from an image and subtract
+       to it an estimation of the sky contribution.  This  sky  estimation  is
+       done  using  a  background  zone that can be specified by the user. The
+       user can also specify the spectrum width. The spectrum position in pix-
+       els has to be specified by the user.
+
+       The extracted spectrum is displayed with gnuplot.
+
+Options
+       -p pos or --spec_p pos
+              pos  is  the  spectrum position in pixels, 1 being the bottom of
+              the image.
+
+       -w width or --spec_w width
+              Spectrum width in pixels.
+
+       -d dist or --sky_d dist
+              dist is the gap in pixels between the spectrum and the zone used
+              to estimate the background.
+
+       -W width or --sky_w width
+              width  is  the  width of the zone used to estimate the backgound
+              (use 0 if you do not one any background correction).
+
+       -n or --nograph
+              This flag is to be used to switch the plot off.
+</pre>
+</body>
+</html>

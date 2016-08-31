@@ -1,0 +1,73 @@
+eclipse/lua bindings
+--------------------
+
+Introduction
+------------
+
+	Lua is a tiny language meant to be embedded in larger
+	projects, it is not meant to be a full-fledged programming
+	language for the development of large applications. It is
+	intended to be used everywhere the need for a simple yet
+	powerful programming language comes out.
+
+	Lua has very simple and efficient constructs which allow an
+	easy programming of high-level algorithms. This is especially
+	useful to add a scripting layer to an existing piece of
+	software. This is exactly what it is used for in eclipse: to
+	provide access to the C functions in eclipse through a simple
+	language that can be used by non-programmers.
+
+
+What is brings
+--------------
+
+	Most high-level routines in the eclipse C library are
+	interfaced to function or variables names in the Lua
+	namespace. This gives access to all users to the library
+	functionalities without having to dive into C programming.
+
+	Even then, this programming layer is not meant for the
+	development of large pieces of software. It should be
+	understood that a scripting language is not meant to develop
+	large projects, but merely controlling what happens at the
+	highest level. The Lua/eclipse binding offers a way of
+	programming your own high-level functionalities by linking
+	together various low-level function calls.
+
+
+Lua references
+--------------
+
+	The main source of Lua information is:
+	http://www.lua.org
+
+
+How to build
+------------
+
+	Install the eclipse-lua package in your eclipse tree, and
+	type 'configure ; make' as usual to build everything. You
+	should now have an executable called 'eclipse' in
+	eclipse/bin.
+
+
+How to use it
+-------------
+
+	The main engine is called simply 'eclipse', it is a Unix
+	program containing all the knowledge about the eclipse
+	library and the Lua language.
+
+	The engine is used by passing the name of a script or a
+	command to execute, and optionally command-line arguments.
+	The engine also offers a very limited interactive mode meant
+	for debugging. See the help message by typing:
+	% eclipse --help
+
+	See the programming manual and the source directories for
+	example. The Lua web site contains various documents about
+	the Lua language which you might want to read.
+
+
+N. Devillard
+Fri Mar 30 14:46:41 CEST 2001

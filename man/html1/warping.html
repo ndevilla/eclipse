@@ -1,0 +1,177 @@
+<html>
+<title>warping man page</title>
+<body>
+<pre>
+Name
+       warping - resample a frame according to a geometrical transformation
+
+Synopsis
+       warping [parameters] [options] &lt;in&gt; [out]
+
+Description
+       warping  is  used  to  resample images according to a given geometrical
+       transformation. Supported transformations for the moment are:
+
+       Integer
+       Integer transformations account for translations with  integer  offsets
+       and rotations of multiples of 90 degrees. No resampling is performed in
+       these cases, only pixel shifts. Integer transformations are declared on
+       the  command-line  exactly  as linear transformations. The command will
+       decide to go to integer pixel shifts  if  it  notices  that  the  input
+       parameters are actually integer.
+
+       Linear
+       Linear  transforms  are covering translations, rotations, scale changes
+       (zoom). It is also possible to provide your own expression of a  linear
+       transform  as two linear polynomials of x and y. Notice that the trans-
+       form is then direct: it transforms pixels from the original image  into
+       pixels in the warped image.
+
+       Polynomial
+       General  polynomial transformations are of any degree in x and y.  Pro-
+       vide on the command-line the degrees for x, y, and the associated coef-
+       ficient.  It  is  possible to specify only a x or y transformation. The
+       other direction transformation will then be Id.  Notice that the trans-
+       form is then reversed (opposite of linear): it transforms pixels in the
+       warped image back into pixels in the original image.
+       If you are trying to fit detector distorsions, it is usually enough  to
+       use  low-order  polynomials  (up  to 3rd degree), because higher orders
+       would introduce oscillations, producing  undesirable  rippling  in  the
+       warped  image. See the adequate litterature about detector distorsions.
+       For distortion corrections, it is possible to use in option  the  TFITS
+       files  produced  by  the  ISAAC  calibration  recipes  ’isaacp arc’ and
+       ’isaacp startrace’ and that contain the distortion polynomials.
+
+       Resampling is done with kernel-based  interpolations.  Several  kernels
+       are  offered:  sinc,  square sinc, Lanczos2, Hamming, Hann, and tanh (a
+       hyperbolic tangent based window). The default kernel is tanh,  see  the
+       adequate  litterature  about  interpolation  kernels to learn more. The
+       command has an option that only "shows" the kernels it  has  available,
+       producing the interpolation window on stdout. By re-directing this out-
+       put to a text file, it should be easy to visualize them with any  plot-
+       ting tool such as gnuplot.
+
+Parameters
+       Linear transforms (includes integer transforms)
+
+       -t or --translate tx ty
+              provides  tx and ty for a translation vector. This option can be
+              combined with a rotation (-r) and/or a scaling (-s) option.
+
+       -r or --rotate angle
+              provides an angle for the rotation, in degrees. Negative  angles
+              are accepted. The rotation center is the center of the image.
+
+       -s or --scale factor
+              provides  a  scaling  factor.  This factor needs not be integer,
+              i.e. a scaling by a factor 1.4142 is possible.
+
+       -T or --transform ’p1 p2 p3 p4 p5 p6’
+              If you know the expression of a linear transform to  apply,  you
+              can  provide  it  through  this  option.  Provide  6  parameters
+              p1...p6.  Enclose the parameters in  simple  quotes.   They  are
+              defined  as  a  forward affine transform from the input image to
+              the output image. If (x,y) are coordinates in  the  input  image
+              and (u,v) coordinates in the output image, then:
+              u = p1.x + p2.y + p3
+              v = p4.x + p5.y + p6
+
+       For  example,  to  apply a scale change of a factor 2 and a translation
+       vector of (+100,-50), both commands are equivalent:
+
+       &gt; warping -s 2 -t ’100 -50’ image.fits
+       &gt; warping -T ’2 0 100 0 2 -50’ image.fits
+       Providing a linear transform allows also other image deformations  than
+       just rotation, scale and translation.
+
+       Polynomial transforms
+
+       Polynomial transforms need be expressed in a reversed way: if (u,v) are
+       the coordinates of a pixel in the warped image, and (x,y) in the origi-
+       nal image, the polynomial needs to be expressed as:
+       x = Px(u,v)
+       y = Py(u,v)
+       Provide  the  two polynomial expressions through the -u and -v options.
+       The polynomial format on the command-line is the following:
+
+       A polynomial is given by triplets of values. The first value  indicates
+       the  degree for u, the second one the degree for v, and the third value
+       is the multiplicative coefficient. For example, 3.u^2.v is written as:
+       2 1 3
+       Another example: the polynomial is 3 + 4.u^2 + v
+       The expression is:
+       0 0 3 2 0 4 0 1 1
+
+       -u or --polyu du dv c0 ... du dv cn
+              Provides the coefficients for Px(u,v).
+
+       -v or --polyv du dv c0 ... du dv cn
+              Provides the coefficients for Py(u,v)
+
+       -A or --arcfile file.tfits
+              The specified file is a table with the 2d  polynomial  that  was
+              created  by  is_spec_arc  and  that describes the slit curvature
+              distortion
+
+       -S or --sttrfile file.tfits
+              The specified file is a table with the 2d  polynomial  that  was
+              created  by  is_spec_startrace  and that describes the startrace
+              distortion
+
+       Resampling kernels
+
+       -k or --kernel name
+              Choose the interpolation kernel used to resample the image. Pos-
+              sible choices are:
+
+       sinc      - "ideal" filter (for infinite signals)
+       sinc2     - square sinc
+       lanczos   - Lanczos function (2nd order)
+       hamming   - Hamming function
+       hann      - Hann function
+       tanh      - Hyperbolic tangent
+       default   - default is tanh kernel
+
+       If you do not know what these functions refer to, it is recommended not
+       to modify them. See documentation about image  warping  to  learn  more
+       about these kernels.
+
+       -w or --write
+              This  option  will  have  a kernel generated then printed out to
+              stdout. No further processing will be done. The output data  can
+              be  redirected  to  a  file,  and/or plotted by any graphical 2d
+              plotter (e.g. gnuplot).
+              Example:
+              &gt; warping -k hamming -w &gt; hamming.dat
+
+       --sub  Flag to simply perform a subsampling of the input image
+
+Algorithm
+       Resampling is done by applying a resampling kernel in image space, over
+       the 16 closest neighbors. The algorithm is the following:
+
+       For each pixel position in the resulting image, compute the position of
+       the source pixel in the original image, interpolate its value over  the
+       16  closest  neighbors  with the chosen kernel. Pixel positions falling
+       out of the original image are assigned a null value.
+
+Files
+       Input files shall all comply with FITS format.
+
+Bugs
+       The interpolation over 16 neighbors implies border  effects  which  are
+       not  handled. Interpolation artifacts can be seen close to high spatial
+       frequencies (especially on bad pixels).
+
+       Only images shall be warped, not data  cubes.  This  extension  may  be
+       implemented in a future release.
+
+       In  linear  transforms: applying only a rotation turns the image around
+       its center. If you try to combine a rotation and a scaling or a  trans-
+       lation,  rotation  is  then done relative to the pixel (0,0), i.e.  the
+       lower left pixel of the image.
+
+       Radial transforms are not implemented yet.
+</pre>
+</body>
+</html>

@@ -1,0 +1,39 @@
+.TH distortion 1 "20 Mar 2003"
+.SH NAME
+distortion \- Distortion estimation 
+.SH SYNOPSIS
+.B distortion 
+[options] 
+.SH DESCRIPTION
+.PP
+.B distortion
+estimates the distortion (vertical lines curvature or horizontal lines 
+curvature) by using images with bright curved lines along x or y. The 
+distortion is fitted as a 2nd degree 2d polynomial representing either the
+distortion along x or y. This polynomial is stored in a TFITS table that
+can be used as is by the
+.B warping
+command.
+.SH ALGORITHM
+.PP
+The input file is an ASCII file containing either one image name (with
+several curved lines) or a list of images (with in each one or more curved
+lines). The command begins by averaging the list of files.
+The arcs are then detected, their shape is precisely extracted, fitted, and
+a general fit is then computed to obtain the final 2d polynomial. The arcs
+can be horizontal or vertical, but this has to be specified with the -O
+option (1 for vertical arcs, 0 for horizontal arcs).
+.SH OPTIONS
+.TP
+.BI \-i " input"
+input is the name of the input ASCII file.
+.TP
+.BI \-o " output"
+output is the name of the output TFITS table.
+.TP
+.BI \-O " orientation"
+orientation is 1 if the curved arcs are vertical and 0 if horizontal.
+.TP
+.SH SEE ALSO
+.PP
+warping

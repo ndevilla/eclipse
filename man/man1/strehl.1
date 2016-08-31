@@ -1,0 +1,111 @@
+.TH strehl 1 "30 Jul 1996"
+.SH NAME
+strehl \- Strehl ratio computation 
+.SH SYNOPSIS
+.B strehl
+[options] <cubes...>
+.SH DESCRIPTION
+.PP
+.B strehl
+computes the Strehl ratio for every plane in every cube given on command
+line. See ALGORITHM to know how it is computed.
+.B strehl
+needs to know some parameters about the mirror and observation wavelength
+to generate the ideal PSF. Defaults for these parameters are taken for
+NACO, use the options to feed other values.
+.B strehl
+accepts jokers on command line :
+.br
+> strehl *.fits
+.PP
+ATTENTION! The input image must be square (same size in x and y), and this
+size shall be a power of 2! This to allow a correct PSF generation. 
+.SH ALGORITHM
+.PP
+For each image in each cube (candidate image), the following algorithm
+is applied:
+.PP
+1. Generate a PSF for a given telescope configuration and observation
+wavelength.
+.PP
+2. Compute the PSF flux and the PSF peak.
+.PP
+3. Detect the brightest star (if not provided on the command line).
+.PP
+4. Compute the star peak and the star flux. This step requires a very
+precise background estimation. A tiny error on the background can have a
+strong effect on the computed strehl.
+.PP
+5. Strehl = (star_peak/star_flux) / (psf_peak/pasf_flux)
+.PP
+6. Compute the error on the Strehl
+.PP
+Attention: the theoretical PSF is generated only once per call! When
+giving several cubes on command-line, it is up to the user to check
+that the same parameters are valid for all files (check the wavelength).
+.SH OPTIONS
+.TP
+.BI \-g
+An ideal PSF is generated for Strehl ratio computation. Using this
+option, a FITS file named 'psf1.fits' is generated in the current
+directory, containing the generated ideal PSF (of Strehl ratio equal
+to 1). Use it to cross-check that the generated PSF fits your
+computation.
+.TP
+.BI \-p " diameter"
+Primary mirror diameter in meters. Default to 8. This value
+is actually 8.2 meters, corrected to take into account the central
+obscuration ratio.
+.TP
+.BI \-d " diameter"
+Secondary mirror diameter in meters. Default to 1.1.
+.TP
+.BI \-l " 'lambda0 dlambda'"
+Do not forget the simple quotes around the 2 values. First value
+is the central wavelength of observation. Second value is the filter
+width. Values are given in microns.
+.br
+Defaults to 5 and 0.1.
+.TP
+.BI \-s " pixelscale"
+Pixel Scale in arc seconds. Defaults to 0.05.
+.TP
+.BI \-P " 'x y'"
+x and y are the pixel position of the star used to compute the strehl. If
+not provided, an automatic bright star detection procedure is applied.
+.TP
+.BI \-r " radius"
+radius is the star radius in arcsecond used to compute the star flux.
+default is 2.0 arcsec.
+.TP
+.BI \-R " 'rad_in rad_out'"
+These radii define a ring around the star. This ring is used to compute the
+background. If these values are not provided, a different background
+estimation method will be used. As the background estimation accuracy is an
+issue in the strehl ration computation, it is far better to use this
+option.
+.TP
+.BI \-b " bg"
+Used to provide the backgound value.
+.TP
+.BI \-S " size"
+Size in pixels of the square used to compute the PSF flux. Default is 64
+pixels. 
+.BI \-T " tel"
+Used to define defaults for supported telescopes. Supportes ones are "3.60"
+and "ut4". Default is "ut4".
+.SH EXAMPLE
+.PP
+To compute the strehl ratio over 10 cubes named S001.fits to S010.fits,
+on an 8 meter telescope with a 1.5 meter secondary mirror, a central
+wavelength of 5.0 um and filter width of 0.1 um, a pixel scale of 0.05,
+use:
+.PP
+.B strehl
+\-p 8 -d 1.5 -l '5 0.1' -s 0.05 S*.fits
+.SH FILES
+.PP
+Files shall all comply with FITS format
+.SH SEE ALSO
+.PP
+stcube

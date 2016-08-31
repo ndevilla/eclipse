@@ -1,0 +1,204 @@
+.TH extract 1 "19 May 1998"
+.SH NAME
+extract \- extract data from a cube
+.SH SYNOPSIS
+.PP
+.B extract -i infile [-o outfile] [mode]
+.PP
+.B extract --in infile [--out outfile] [mode]
+.SH DESCRIPTION
+.PP
+.B extract
+is used to extract data from a cube.
+Several modes of extraction are implemented : plane extraction,
+cube extraction (continuously from one plane to another), pattern
+extraction, quadrant extraction, list of planes, and rectangle (slit)
+extraction.
+.PP
+Details are given below on modes and syntax.
+.SH COMMAND LINE
+.B extract
+receives always at least one option: the input file name, provided by
+\-i or \--in. Providing the output file name by \-o or \--out is not
+mandatory and sometimes not possible. Defaults for output names depend
+on the extraction mode. 
+.SH EXTRACTION MODES
+.TP
+.BI "\-m " plane " -b " num " -e " num 
+extracts planes to single files. Plane numbers go from
+1 to the number of planes in the cube (NAXIS3). Default value for
+beginning plane is 1, default value for end plane is NAXIS3.
+To extract one plane only, give the same number for begin and end.
+.TP
+.BI "\-m " cube " -b " num " -e " num
+extracts a cube from another, edge planes are included.
+Default value for begin plane is 1, default value for end plane
+is NAXIS3.
+.TP
+.BI "\-m " quad " -x " 1234
+extracts quadrants from a cube. Quadrants to extract
+shall be requested by a character string containing
+the quadrant numbers.
+Quadrants are named according to the following convention:
+.br
+1 2
+.br
+4 3
+.TP
+.BI "\-m " pattern " -x " "01101001... " "\-s " step 
+extracts planes in a cube according to a pattern.
+A pattern is a character string containing only
+0 and 1's, planes identified with a 1 are extracted,
+those with a 0 are not. The pattern is periodically
+repeated.
+.PP
+The step option identifies how many planes are taken into account per
+cycle step. e.g. an extraction pattern of 01, with a step parameter
+of 5 would yield an actual extraction pattern of 0000011111.
+This parameter defaults to 1 plane per cycle step.
+.TP
+.BI "\-m " list " -f " file
+This option uses a list of plane numbers given into a text file.
+It extracts the requested planes to one cube.
+.PP
+It is mainly intended to be used with
+.B stcube
+which would first extract all statistical information from a cube,
+then use a selector program to extract plane numbers corresponding
+to planes which have interesting statistical values, and then
+extract only these planes to a cube. 
+.TP
+.BI \-m " rect " -x " 'LLX LLY URX URY'"
+This option extracts a rectangular area over the whole cube.
+Input option defines the area by feeding in the lower left corner
+and upper right corner coordinates. The rectangle itself limiting
+the area is included in the extracted part.  Do not forget to input them 
+within simple quotes! The coordinate system is given according to
+the FITS reference:
+.PP
+First pixel in image is in lower left corner, and has coordinates
+(1,1). Last pixel in image is in upper right corner of the image
+and has coordinates (NAXIS1, NAXIS2).
+.PP
+LLX and LLY are the coordinates of lower left corner.
+.br
+URX and URY are the coordinates of upper right corner.
+.SH LONG OPTIONS
+.PP
+Here are long option equivalents for all command-line switches:
+.PP
+General options:
+.br
+\-i         = \--in
+.br
+\-o         = \--out
+.PP
+Mode names:
+.br
+\-m plane   = \--plane
+.br
+\-m cube    = \--cube
+.br
+\-m quad    = \--quadrant
+.br
+\-m pattern = \--pattern
+.br
+\-m list    = \--list
+.br
+\-m rect    = \--rectangle
+.PP
+Mode options:
+.br
+\-b         = \--begin
+.br
+\-e         = \--end
+.br
+\-x         = \--ext
+.br
+\-f         = \--name
+.SH FILES
+.PP
+Input files shall all comply with FITS format
+Output files have the same pixel type as input files.
+.SH NAMING SCHEMES
+In single file output, default name is 'out.fits'. In multiple
+file output, default names depend on the extraction mode:
+.PP
+in plane mode : basename.0001.fits to basename.9999.fits
+.PP
+in quadrant mode : basename.quad.1.fits to basename.quad.4.fits
+.PP
+The original FITS header of the input FITS file (-i option) 
+is conserved along, except for the following keywords:
+NAXIS, NAXISn, BITPIX, BSCALE, BZERO, which are related to the
+newly created file.
+.PP
+HISTORY keywords are appended to the FITS header to indicate the
+eclipse process modifications.
+.SH EXAMPLES
+.PP
+To extract plane 53 out of cube 'incube.fits' (output name is optional, 
+default would be incube.0053.fits):
+.PP
+> extract -m plane -i incube.fits -b 53 -e 53 -o p53.fits
+.PP
+To extract all planes of file 'incube.fits' to different FITS files 
+(multiple file output, output name option is not considered):
+.PP
+> extract -m plane -i incube.fits
+.br
+would generate files names such as incube.0001.fits and so on, to last
+plane number.
+.PP
+To extract all planes from plane 10 to last one in 'incube.fits', into a 
+single cube named 'truncated.fits':
+.PP
+> extract -m cube -i incube.fits -b 10 -o truncated.fits
+.PP
+To extract only quadrants 2 and 4 from 'incube.fits':
+(multiple file output, output name option is not considered):
+.PP
+> extract -m quad -x 24 -i incube.fits
+.br
+Output files are named 'incube.quad.2.fits' and 'incube.quad.4.fits'.
+.PP
+To extract only even planes from 'incube.fits' to 'even.fits':
+.PP
+> extract -m pattern -x '01' -i incube.fits -o even.fits
+.PP
+To extract planes 2, 3, 5, 7 and 11 in cube incube.fits to one cube
+named partial.fits, create a file named listp for example, and type
+in the plane numbers:
+.PP
+---- beginning of file 'listp' ----
+.br
+2
+.br
+3
+.br
+5
+.br
+7
+.br
+---- end of file 'listp' -----
+.PP
+The command is then:
+.br
+> extract -m list -f listp -i incube.fits -o partial.fits
+.PP
+To extract both lower quadrants in a 256x256 image named in.fits,
+into an image named lower.fits:
+.br
+> extract -m rect -x '1 1 256 128' -i in.fits -o lower.fits
+.PP
+The following commands are equivalent:
+.br
+> extract -m pattern -x '0000011111' -i infile.fits -o out.fits
+.br
+> extract -m pattern -x '01' -s 5 -i infile.fits -o out.fits
+.SH SEE ALSO
+.PP
+.B catcube, stcube
+.SH BUGS
+.PP
+Misuse of command line switches may result in undefined behaviour.

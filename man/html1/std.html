@@ -1,0 +1,72 @@
+<html>
+<title>std man page</title>
+<body>
+<pre>
+Name
+       std - standard star search
+
+Synopsis
+       std [search] [display]
+
+Description
+       std  is a command-line tool which allows to browse an internal database
+       of infra-red standard stars.  std contains  internally  a  database  of
+       more  than  800  stars,  built-up by J.G.Cuby.  From the catalog, it is
+       possible to select stars based  on  a  position  criterion,  name,  sky
+       region, or magnitude in a given band.  Results can be displayed in dif-
+       ferent formats.
+
+Search Options
+       Search options are related to different user-defined criteria to select
+       a number of stars in the database. The following are implemented:
+
+       -p/--pos HH MM SS HH MM SSorDD DD
+              If  this  is the only search criterion on the command-line, only
+              the closest star to this position will be returned. The position
+              can  be  provided  as  hours, minutes, seconds for RA and DEC (6
+              values expected) or simply in degrees (2 values expected).
+
+       -r/--radius value
+              Together with the --pos option, this specifies a radius around a
+              sky position. All stars within this region will be selected.
+
+       -n/--name value
+              To search stars by name. The provided value is a regular expres-
+              sion, all stars matching it will be selected.
+
+       -m/--mag band min max
+              To search stars by magnitude range in a given  wave  band.  Sup-
+              ported  wave bands are: J, H, K, Ks, L, Lprime, M, Mprime. Mini-
+              mum and maximum magnitudes define a range into which  all  stars
+              are selected.
+
+Display Options
+       -k/--key
+              To display the output in keyword format.
+
+Files
+       The  star  database contains the following informations about stars (in
+       this order):
+       Name of the star
+       RA and DEC in HH:MM:SS format
+       Spectral type
+       Magnitudes in J, H, K, Ks, L, M.
+
+Examples
+       To print out the closest star from position ’10 12’ (in degrees):
+       std --pos "10 12"
+
+       To print out all stars within 10 degrees of this position:
+       std --pos "10 12" --radius 10
+
+       To print out all stars which name matches "FS*"
+       std --name "FS*"
+
+       To look for all stars in band L having a magnitude between 5 and 6:
+       std --mag "L 5 6"
+
+Bugs
+       It is not yet possible to combine selection criteria.
+</pre>
+</body>
+</html>

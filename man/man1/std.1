@@ -1,0 +1,81 @@
+.TH std 1 "25 January 1999"
+.SH NAME
+std \- standard star search 
+.SH SYNOPSIS
+.B std
+[search] [display]
+.SH DESCRIPTION
+.PP
+.B std
+is a command-line tool which allows to browse an internal database of infra-red
+standard stars.
+.B std
+contains internally a database of more than 800 stars, built-up by
+J.G.Cuby. 
+From the catalog, it is possible to select stars based on a
+position criterion, name, sky region, or magnitude in a given band.
+Results can be displayed in different formats.
+.SH SEARCH OPTIONS
+.PP
+Search options are related to different user-defined criteria to select
+a number of stars in the database. The following are implemented:
+.TP
+.BI \-p/--pos " HH MM SS HH MM SS" or "DD DD"
+If this is the only search criterion on the command-line, only the
+closest star to this position will be returned. The position can be
+provided as hours, minutes, seconds for RA and DEC (6 values expected) or
+simply in degrees (2 values expected).
+.TP
+.BI \-r/--radius " value"
+Together with the \--pos option, this specifies a radius around a sky
+position. All stars within this region will be selected.
+.TP
+.BI \-n/--name " value"
+To search stars by name. The provided value is a regular expression, all
+stars matching it will be selected.
+.TP
+.BI \-m/--mag " band min max"
+To search stars by magnitude range in a given wave band. Supported wave
+bands are: J, H, K, Ks, L, Lprime, M, Mprime. Minimum and maximum magnitudes 
+define a range into which all stars are selected.
+.SH DISPLAY OPTIONS
+.TP
+.B \-k/--key
+To display the output in keyword format.
+.SH FILES
+.PP
+The star database contains the following informations about stars (in
+this order):
+.br
+Name of the star
+.br
+RA and DEC in HH:MM:SS format
+.br
+Spectral type
+.br
+Magnitudes in J, H, K, Ks, L, M.
+.SH EXAMPLES
+.PP
+To print out the closest star from position '10 12' (in degrees):
+.br
+.B std
+\--pos "10 12"
+.PP
+To print out all stars within 10 degrees of this position:
+.br
+.B std
+\--pos "10 12" \--radius 10
+.PP
+To print out all stars which name matches "FS*"
+.br
+.B std
+\--name "FS*"
+.PP
+To look for all stars in band L having a magnitude between 5 and 6:
+.br
+.B std
+\--mag "L 5 6"
+.PP
+.SH BUGS
+.PP
+It is not yet possible to combine selection criteria.

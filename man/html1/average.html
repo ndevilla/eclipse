@@ -1,0 +1,92 @@
+<html>
+<title>average man page</title>
+<body>
+<pre>
+Name
+       average - cube averaging
+
+Synopsis
+       average [options] [parameters]
+
+Description
+       average  reduces  a FITS cube over its third dimension, by applying one
+       of several possible algorithms described below. Users should specify  a
+       cut  and  a  method. The cut describes how planes in the input cube are
+       grouped for averaging, the method specifies what  kind  of  average  is
+       applied.
+
+Parameters
+       -i &lt;incube&gt; or --in &lt;incube&gt;
+              Specifies the name of the input cube (mandatory).
+
+       -o &lt;outcube&gt; or --out &lt;outcube&gt;
+              Specifies the name of the output cube (optional). Default output
+              name for an input cube named incube.fits is incube.avg.fits.
+
+Options
+       Cuts
+
+       Cuts specify how to group  the  input  planes  to  apply  the  average.
+       Default cut is --cut whole.
+
+       --cut whole
+              applies the average on the whole cube, i.e. all planes are aver-
+              aged to a single one according to the requested method.
+
+       --cut cycle --step &lt;n&gt;
+              applies the average for every &lt;n&gt; planes in the input cube.  For
+              example,  if  the  input cube contains 50 planes and this cut is
+              specified with n=10, the planes will be averaged  10  by  10  to
+              produce one cube in output containing 5 planes.
+
+       --cut running --halfwidth &lt;h&gt;
+              Performs  a  running average: the output is a cube containing as
+              many planes as the input cube. Each plane is the  result  of  an
+              average  over  an  interval  centered  on  the same plane in the
+              input, plus or minus &lt;h&gt; planes. This means that central  planes
+              will  be  the average of 2h+1 input planes, and edge planes will
+              be an average of between h+1 and 2h+1 input planes.
+
+       Example: the input cube has 6 planes, h=2. Brackets show where the cen-
+       tral plane is at each iteration.
+
+       plane 1 is built from [1] 2  3
+       plane 2 is built from  1 [2] 3  4
+       plane 3 is built from  1  2 [3] 4  5
+       plane 4 is built from     2  3 [4] 5  6
+       plane 5 is built from        3  4 [5] 6
+       plane 6 is built from           4  5 [6]
+
+       Methods
+
+       Methods specify how to perform the average. Default is linear.
+
+       --method linear
+              Performs a normal, linear average of the input planes.
+
+       --method sum
+              Same  as  linear,  but does not divide by the number of averaged
+              planes at the end. Useful for cubes which do not have much  sig-
+              nal.
+
+       --method median
+              Median filtering along the z-axis.
+
+       --method filtered
+              with additional parameters --filt-low npix and --filt-high npix.
+              This is actually an extension of the median average. A time line
+              is  extracted for each pixel position on the detector (along the
+              z-axis), and then sorted out. The median average would only keep
+              the  central  value,  whereas  this  method requests two numbers
+              specifying how many low and high pixels shall be rejected before
+              making an average.
+
+Files
+       Input files shall all comply with FITS format.
+
+Bugs
+       It  is not yet possible to combine a running filter cut with a filtered
+       average method.
+</pre>
+</body>
+</html>

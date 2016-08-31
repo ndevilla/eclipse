@@ -1,0 +1,81 @@
+.TH ado_refits 1 "28 Jun 1996"
+.SH NAME
+ado_refits \- reformat an Adonis FITS file to standard FITS 
+.SH SYNOPSIS
+.B ado_refits
+[options] <FITS files...>
+.SH DESCRIPTION
+.LP
+.B ado_refits
+is used to 'reformat' features in the cube header that 
+may not comply 100% with the FITS standard.
+If time information is present in the images, it is removed
+from the planes and written in the header.
+.LP
+Output files have the same name as input files, but no leading path
+name. To overwrite files, use 
+.B ado_refits
+in the directory where you put your data files.
+If you do not want to overwrite your files, go into the directory where
+you want to put the new set of files, and fetch the files by giving their
+complete path name.
+.SH OPTIONS
+.TP
+.BI \-c
+Convert HIERACH keywords to COMMENT. This is useful when dealing with
+ESO FITS files which contain this non-standard FITS feature. 
+.B ado_refits
+keeps the same header by default, and converts these keywords to
+COMMENTs for compatibility with other FITS readers.
+.SH EXAMPLES
+.LP
+All files are in current directory, to overwrite them with reformated data,
+just use:
+.LP
+.B ado_refits
+*.fits
+.LP
+All files are in directory /dev/cdrom/adonis, to output the newly reformated
+files in /space/data, you would do:
+.LP
+% cd /space/data
+.br
+% ado_refits /dev/cdrom/adonis/*.fits
+.SH FILES
+.LP
+Input files are in Adonis FITS format
+.LP
+Output files are (hopefully) FITS compliant. They do not contain the
+time information in the planes anymore, but directly in the FITS header.
+Time information is added at the end, under HISTORY keywords. Use the
+.B dfits
+utility to visualize them, output them to a text file, etc.
+.SH BUGS
+.LP
+The FITS reader implemented in eclipse has been enhanced to support
+common errors made in FITS writing. Nevertheless, these errors have
+to be reported to the user, and they are in verbose mode. Reporting
+these FITS errors to the originators of the files could help a lot
+improving the quality of these files.
+.LP 
+Typically, the most common reported error is:
+.br
+*** Invalid format : using STRING
+.br 
+which is generated for illegal keyword values such as:
+.br
+DOOR    = Opened
+.br 
+which should be:
+.br
+DOOR    = 'Opened'
+.LP
+For more information, see the 'sci.astro.fits' newsgroup, or
+get the file "Source of FITS information" at the following URL:
+.LP
+http://ssdoo.gsfc.nasa.gov/astro/fits/fits_home.html
+.br
+(updated July 1996)
+.SH AUTHOR
+.LP
+N. Devillard -- ESO

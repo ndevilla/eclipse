@@ -1,0 +1,77 @@
+.TH setpix 1 "17 July 2000"
+.SH NAME
+setpix \- batch command to set pixel values from a list in a text file 
+.SH SYNOPSIS
+.B setpix
+[options] <in> [out]
+.SH DESCRIPTION
+.PP
+.B setpix
+takes a list of 2-d pixel positions and pixel values, and the name of
+a FITS file (a data cube, an image, a pixel map or an ASCII list). For a
+given image, it goes to all requested pixel positions and changes the pixel
+value to the one requested in the list. For a cube, the process is repeated
+identically over all the planes in the file. For an ASCII list, the process
+is repeated over all planes in the list and the output is a single FITS
+file with multiple planes (i.e. a cube).
+.PP
+Example:
+.br
+The text file 'regions.txt' contains the following data:
+.br
+----- begin regions.txt -----
+.br
+#
+.br
+# file: regions.txt
+.br
+# defines pixels to be set
+.br
+#
+.br
+1 1 0.0
+.br
+128 128 100.0
+.br
+256 256 1000.0
+.br
+----- end regions.txt   -----
+.PP
+Using the following command:
+.br
+% setpix \-f regions.txt image1.fits
+.br
+would make the following changes in the image 'image1.fits':
+.PP
+pixel value at position (1,1) is changed to 0.0
+.br
+pixel value at position (128,128) is changed to 100.0
+.br
+pixel value at position (256,256) is changed to 1000.0
+.PP
+The text file specifying pixel positions and pixel values respects 
+the following syntax rules:
+.PP
+Any line beginning with a hash (#) is a comment, thus not processed.
+.PP
+Pixel positions are given as integer values. They follow the FITS convention
+for pixel positions: first pixel of the image is located at coordinates
+(1,1) in the lower left corner of the image. X is increasing from left
+to right, Y from bottom to top.
+.PP
+Pixel values are given as floating point numbers. For pixel maps, these
+values are rounded up to the nearest integer value lower than the one
+requested.
+.PP
+Default output file name for a file named 'file.fits' is 'file_set.fits'.
+.SH OPTIONS
+.TP
+.BI \-f " regions.txt"
+Declares the name of the file containing pixel positions and values. Default
+name for this file is "pts.txt".
+.SH FILES
+.PP
+Data files shall all comply with FITS format
+.PP
+The list of pixel positions and values is a text file, respecting the
+syntax described above.

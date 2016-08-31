@@ -1,0 +1,586 @@
+<html>
+<head>
+   <title>eclipse Frequently Asked Questions</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+
+<p>
+<h1><img src="../icons/ecl_icon.gif" alt="*" height=64 width=64>
+Frequently Asked Questions about <b>eclipse</b>
+</h1>
+</p>
+
+
+<p><i>&#169 European Southern Observatory</i>
+</p>
+
+<p><hr size="4"></p>
+
+
+<p><i>FAQ Revised: Friday 23 September 2005 12:12:00</i></p>
+<hr><h2>Table of Contents</h2>
+<dl>
+<dt><b>1. General</b></dt>
+<dd><ul>
+<li><a href="#General0">1.1. Who is supporting <b>eclipse</b>?</a></li>
+<li><a href="#General1">1.2. What can I do with <b>eclipse</b>?</a></li>
+<li><a href="#General2">1.3. Why should I use <b>eclipse</b>?</a></li>
+<li><a href="#General3">1.4. Is it safe to base my software developments on eclipse?</a></li>
+<li><a href="#General4">1.5. How do I quote eclipse in my papers?</a></li>
+</ul></dd>
+<dt><b>2. Commands</b></dt>
+<dd><ul>
+<li><a href="#Commands0">2.1. What is a pipeline recipe exactly?</a></li>
+<li><a href="#Commands1">2.2. What kind of FITS files are supported?</a></li>
+<li><a href="#Commands2">2.3. What are maximum data sizes accepted by <b>eclipse?</b></a></li>
+<li><a href="#Commands3">2.4. Where can I find a list of all commands?</a></li>
+<li><a href="#Commands4">2.5. Where is the help message for each command?</a></li>
+<li><a href="#Commands5">2.6. What are the options common to all commands?</a></li>
+<li><a href="#Commands6">2.7. Why is there no deconvolution routine?</a></li>
+<li><a href="#Commands7">2.8. ccube does not recognize my FITS files</a></li>
+<li><a href="#Commands8">2.9. <tt>ccube</tt> does not handle the standard arithmetic notation correctly</a></li>
+</ul></dd>
+<dt><b>3. Software</b></dt>
+<dd><ul>
+<li><a href="#Software0">3.1. How can I tell which <b>eclipse</b> version I have?</a></li>
+<li><a href="#Software1">3.2. What is the numbering scheme for versions?</a></li>
+<li><a href="#Software2">3.3. <b>eclipse</b> does not compile on my station!</a></li>
+<li><a href="#Software3">3.4. Is it Ok to compile eclipse on a machine and run the binaries on
+another?</a></li>
+<li><a href="#Software4">3.5. I get some warnings during compilation</a></li>
+<li><a href="#Software5">3.6. The <TT>*.fits</TT> issue</a></li>
+</ul></dd>
+<dt><b>4. Tips</b></dt>
+<dd><ul>
+<li><a href="#Tips0">4.1. grepfits</a></li>
+<li><a href="#Tips1">4.2. Sorting out files</a></li>
+<li><a href="#Tips2">4.3. Using eclipse commands as Unix filters</a></li>
+</ul></dd>
+</dl>
+<hr><h2>1. General</h2>
+<dl>
+<dt><b><a name="General0">1.1. Who is supporting <b>eclipse</b>?</a></b></dt>
+<dd>Yves Jung is currently maintaining the main library and instrument
+packages. Roeland Rengelink is taking care of the eclipse-python
+interfaces.<br><br></dd>
+<dt><b><a name="General1">1.2. What can I do with <b>eclipse</b>?</a></b></dt>
+<dd><b>eclipse</b> was initially written having <I>Adonis</I> in mind, but
+was later enhanced (almost completely rewritten) to support more
+instruments. It is basically a set of tools to work directly on images in
+FITS format.<br><br></dd>
+<dt><b><a name="General2">1.3. Why should I use <b>eclipse</b>?</a></b></dt>
+<dd><b>eclipse</b> is not IRAF. It is a data reduction engine written in C
+for portability and speed reasons. From this C library, the ISAAC
+pipeline team has built a number of Unix commands that are specialized
+for ISAAC imaging and spectroscopy data processing. We have put into
+it the know-how of the instrument scientist, and many other
+contributing people. We do believe that what is actually done by these
+routines is representative of what most people will want to do with
+the data.
+<p>
+You do not "learn" eclipse. The commands are more or less dedicated, one
+per template. What you have to learn is more or less similar to learning
+new IRAF commands (what to put in 'epar', how to launch it, learn what is
+happening in the algorithm, etc.). You do not have to learn a new
+language, because what it takes is launching a Unix command, not more.<br><br></dd>
+<dt><b><a name="General3">1.4. Is it safe to base my software developments on eclipse?</a></b></dt>
+<dd>It depends on which part of <b>eclipse</b> you intend to use.
+The C library offers a number of services for astronomical image
+processing, but we do not guarantee the stability of the C API. In
+other words, some functions might disappear or be completely re-engineered
+from one version to another without warning, function prototypes are
+constantly modified, data structures are evolving, etc.
+<p>
+If you want to base a C development on this library, you are not advised to
+do so. Say you want to go ahead and develop C or C++ software based on
+<b>eclipse</b>. You will download the latest version today and start
+working on it. Next version comes, and you realize that an object you have
+been using all along has changed types and is now offered in an
+incompatible way. You will have to either re-write your code completely to
+make use of the new structure (tedious and unsafe), or you have to un-hook
+your development from the <b>eclipse</b> mainstream, forking from the main
+project. It might be good to be independent, but you will also miss all bug
+corrections and new enhancements to the library.
+<p>
+On the other hand, we have developped interfaces to scripting languages
+(Python and Lua) for which we guarantee a certain level of stability.
+Functions and objects might change in the underlying C library, but we try
+to keep the upper layer as stable as possible. The Python and Lua cubes
+offer very simple operators, and they are sufficiently high-level not to be
+concerned with the details of the underlying C library. This efficiently
+shields script writers from changes in the low-level library.
+<p>
+So: if you want to base a C development on <tt>libeclipse.a</tt> and
+<tt>eclipse.h</tt>, it is highly not recommended unless you really want to
+fork from the mainstream development, or are sufficiently confident that
+you will be able to support the changes arising in the later versions.
+Using scripting languages is the way to go for most developments. There is
+of course no absolute rule, you are the best placed to consider what should
+be done in your software project.<br><br></dd>
+<dt><b><a name="General4">1.5. How do I quote eclipse in my papers?</a></b></dt>
+<dd>References to eclipse should be made by quoting:<BR>
+N. Devillard, "The eclipse software", The messenger No 87 - March 1997<br><br></dd>
+</dl>
+<hr><h2>2. Commands</h2>
+<dl>
+<dt><b><a name="Commands0">2.1. What is a pipeline recipe exactly?</a></b></dt>
+<dd>This question has never been raised directly, but many misunderstandings
+could have been cleared earlier if it had been raised in time.
+<p>
+ESO is trying to build and validate a number of automatic data reduction
+tools to provide calibrated and reduced data in the shortest time, without
+any intervention from the user. The fundamental principle behind pipelines
+is precisely that they run without anybody to specify which calibration
+data to use, which recipe to use, or tell the software what to do in case
+of failure of one component or another.
+<p>
+A pipeline recipe is a data reduction program that reduces a given set of
+frames, possibly using provided calibration frames. This program takes in
+input a list of relevant frames and produces one or more products. Recipes
+are launched by the pipeline infrastructure.
+<p>
+Since recipes do not interact with a user, there are many choices that they
+cannot do like discarding a frame that would happen to have a satellite
+trail, and if they have to make choices, there can be no guarantee that it
+will always be correct. Other restrictions imposed by this lack of
+interactivity are simply a switch to another algorithm that might be more
+efficient for a given data set. No automatic software can be expected to do
+that in a reliable way. Pipeline products are usually a good indication of
+what will be obtained after proper (hand) data reduction, but they are
+rarely a final product.
+<p>
+If you reduce your data using eclipse recipes for the supported
+instruments, you will find handy that with little preparation work you can
+usually get a result in no time (assuming everything goes fine), without
+having to type anything more than the configuration files. But your task
+should not stop there: validate what can be validated against catalogs and
+previous measurements, re-run the procedure with slightly different
+parameters, apply the same reduction with another algorithm or software,
+etc. Keep in mind that an automatic software must be robust and will not
+outsmart you. <i>Do not blindly trust what comes out.</i><br><br></dd>
+<dt><b><a name="Commands1">2.2. What kind of FITS files are supported?</a></b></dt>
+<dd>The latest version now supports data files with 2 or 3 dimensions
+(images and cubes), and list of FITS files declared in ASCII lists.
+The latest version of the FITS handling routines now offer support for
+FITS files with extensions and both binary and ASCII tables, but this
+does not show up yet in the associated Unix commands. Only some ISAAC
+recipes are offering access to FITS tables or producing them, and no
+command for the moment is offering any functionality on data found in
+extensions. That will be added as the need arises.<br><br></dd>
+<dt><b><a name="Commands2">2.3. What are maximum data sizes accepted by <b>eclipse?</b></a></b></dt>
+<dd>This has been increased in the latest versions. Initially, it was set
+that no image bigger than 512x512 and no cube having more than 128
+frames could be fed into any <b>eclipse</b> routine... But that was eons
+ago (1995), and since then detector sizes have grown a lot bigger, and
+instruments like GraF are producing cubes with thousands of (small)
+frames. In version 3.3, <b>eclipse</b> supports image sizes up to 40k
+pixels in both directions, and up to 10k frames per cube. Do not even
+try to input a cube of size 40k/40k/10k, though, that could mean more
+than the fatal limit of 4 gigabytes of data, limit intrisically set on
+32-bit machines (2^32 is usually used to represent 4 gigabytes).
+<p>
+If you need to increase some of these parameters, the limits have been
+intentionally set in a deeply rooted include file, which means you have
+to modify a basic eclipse source file and recompile everything from
+scratch (having taken care of removing all binary executables, libraries
+and object files before recompiling). The file to edit is
+<tt>eclipse/include/cube_defs.h</tt> and the constants to modify are:
+<p>
+<pre>
+#define MAX_COLUMN_NUMBER               (40000)
+#define MAX_LINE_NUMBER                 (40000)
+#define MAX_IMAGE_NUMBER                (10240)
+</pre>
+<p>
+Do not forget in any case that <b>eclipse</b> always makes the
+assumption that any single input image fits into memory (be it real or
+virtual). Nowhere in <b>eclipse</b> has been introduced a stripe-based
+processing of data which could allow simple operations to be executed on
+huge images. This is again done on purpose, because <b>eclipse</b> is
+more targeted towards executing image processing tasks on many
+reasonably-sized images, than applying dumb operations to enormous data
+sets. If you happen to process data files containing really large
+images, I'd recommend either to cut down the images to smaller ones, or
+to go to other data processing packages.
+<p>
+This being said, if there are requests for that kind of processing it is
+very possible to add up such functionalities in the library, but that
+effort simply has not been identified yet.<br><br></dd>
+<dt><b><a name="Commands3">2.4. Where can I find a list of all commands?</a></b></dt>
+<dd>Try <tt>'man eclipse-commands'</tt>.<br><br></dd>
+<dt><b><a name="Commands4">2.5. Where is the help message for each command?</a></b></dt>
+<dd>Previous versions of <b>eclipse</b> used to deliver a help message when
+launched with no arguments. Another convention has been taken, namely
+that launching a command without arguments would start it with default
+arguments whenever possible. To get the help message, you should use the
+<tt>--help</tt> option. See the following example for <tt>jitter</tt>:
+<p>
+<pre>
+% jitter
+<p>
+
+********** jitter
+********** part of eclipse library. (c) ESO 1996-2001
+<p>
+purpose: isaac/sofi jitter imaging reduction
+<p>
+parsing configuration file...
+error: cannot find ini file [jitter.ini]: aborting
+error: in parsing jitter.ini: aborting jitter
+<p>
+% jitter --help
+<p>
+
+********** jitter
+********** part of eclipse library. (c) ESO 1996-2001
+<p>
+purpose: isaac/sofi jitter imaging reduction
+<p>
+
+use : jitter [flags] [options]
+flags are :
+<p>
+        -g or --generate : generate a .ini file
+        -t or --time     : estimate used CPU time
+        --offset         : get help about the offset file format
+        -h or --help     : get this help
+<p>
+options are :
+<p>
+        -f <filename> or --file <filename>
+        to specify which .ini file to work on (default: jitter.ini)
+<p>
+        -w or --gui
+        to launch the GUI
+<p>
+following options are only valid with -g or --generate:
+        -i or --in <filename>     provide input file name
+        -o or --out <filename>    provide output file name
+        -c or --calib <filename>  provide calibration file name
+</pre><br><br></dd>
+<dt><b><a name="Commands5">2.6. What are the options common to all commands?</a></b></dt>
+<dd>Some options are supported by most <b>eclipse</b> commands. Only the
+stand-alone sources do not support them all. The options are:
+<p>
+<pre>
+Short    Long          Action
+<p>
+-L       --license     Display license and exit
+         --help        Display short help and exit
+         --version     Display current version and exit
+</pre>
+<p>
+Notice that there were previously (eclipse 3.3 and before) options to
+set the verbose and debug mode, and an option to setup memory
+requirements. These are not settable through command-line options any
+more, but through environment variables. See the <tt>INSTALL</tt> file
+in the base eclipse directory in any distribution (3.4 and later).<br><br></dd>
+<dt><b><a name="Commands6">2.7. Why is there no deconvolution routine?</a></b></dt>
+<dd>Because <b>eclipse</b> is dedicated to data pre-processing and simple
+calibrations. People who want to build pipelines reducing data quickly
+without user interactions are interested in <b>eclipse</b> because it
+offers convenient functionalities to implement that kind of thing once
+the algorithms are frozen. Deconvolution is definitely something which
+badly needs user interactions. People doing deconvolution would not
+believe a blackbox doing the job without more than text messages, better
+turn to MIDAS or IDL for that kind of job, where an interactive session
+is really supported.
+<p>
+This being said, it is true that <b>eclipse</b> has a very fast
+processing engine which may be ideally suited to implement CPU-intensive
+algorithms as all deconvolution algorithms are. You are free to write
+your own scripts making use of the FFT and arithmetic routines of
+<b>eclipse</b> to implement quickly standard deconvolution algorithms.
+Support for classical deconvolution stuff is not yet planned into
+<b>eclipse</b>, though.<br><br></dd>
+<dt><b><a name="Commands7">2.8. ccube does not recognize my FITS files</a></b></dt>
+<dd><tt>ccube</tt> recognizes FITS files just like any other <b>eclipse</b>
+routine. It is more likely that you have typed an ambiguous arithmetic
+expression. The syntax for <tt>ccube</tt> arithmetic expressions is
+token-based. A token is either an operator or an operand. Operators are
+usual arithmetic signs: <tt>+ - / * ^ e l</tt> (<tt>'e'</tt> stands for
+exponentation and <tt>'l'</tt> for logarithm). Operands are either
+numbers in standard floating point notation or FITS files. A token is
+identified as as FITS file by the following criteria:
+<p>
+<ul>
+	<li>It has a <tt>.fits</tt> or <tt>.FITS</tt> suffix.</li>
+	<li>It is prefixed by an arobas <tt>@</tt>.</li>
+</ul>
+<p>
+For example, if you want to subtract two FITS images named <tt>object</tt>
+and <tt>skybg</tt>, they will not be recognized by <tt>ccube</tt> as
+FITS files unless you prefix their name in the expression with an
+arobas.
+<p>
+
+<pre>
+--- Incorrect ---
+% ccube "object skybg -" bgsub
+error: unrecognized token: [object]
+error: in arithmetic expression: exiting
+<p>
+--- Correct ---
+% ccube "@object @skysub -" bgsub
+</pre><br><br></dd>
+<dt><b><a name="Commands8">2.9. <tt>ccube</tt> does not handle the standard arithmetic notation correctly</a></b></dt>
+<dd>Well, let's face it: with file names such as <tt>32</tt> or
+<tt>image1-image2</tt>, it becomes really hard to tell what is an
+operation and what is an operand. Example:
+<p>
+<pre>
+% ls
+  image1
+  image2
+  image1-image2
+  2
+% ccube -s "image1-image2/2"
+</pre>
+<p>
+Simple case: there are files named 'image1', 'image2', 'image1-image2',
+and '2' in the current directory. What should be used to do what??
+Also: how do you make the difference between the slash as the operator
+for the division, and the slash as a separator for path names?
+<p>
+To remove ambiguities, go to Polish Reverse Notation and separate all
+your arguments by blanks. The above example could then be written,
+depending on what was intended:
+<p>
+<pre>
+Subtract file 'image2' from file 'image1' and divide by 2:
+% ccube "@image1 @image2 - 2 /"
+<p>
+Subtract file 'image2' from file 'image1' and divide by file '2':
+% ccube "@image1 @image2 - @2 /"
+<p>
+Divide the file 'image1-image2' by 2:
+% ccube "@image1-image2 2 /"
+<p>
+Divide the file 'image1-image2' by file '2':
+% ccube "@image1-image2 @2 /"
+<p>
+Subtract file '2' in directory 'image2' from file 'image1':
+% ccube "@image1 @image2/2 -"
+</pre>
+<p>
+
+The case is quite common, actually with VLT archive file names such as:
+<tt>ONTT.1998-12-03T00:45:04.069.fits</tt> it becomes hard to
+distinguish the file name from a bunch of numerical arguments, unless we
+restrict FITS file names in input to a pre-defined list, but that would
+be endless and not so useful. Better go to Polish Reverse Notation.<br><br></dd>
+</dl>
+<hr><h2>3. Software</h2>
+<dl>
+<dt><b><a name="Software0">3.1. How can I tell which <b>eclipse</b> version I have?</a></b></dt>
+<dd>Launch an <b>eclipse</b> command with a single option on command-line:
+<TT>--version</TT> (don't forget the double dash sign, for long
+options). With most <b>eclipse</b> commands, it prints out the version
+number of the <b>eclipse</b> library that was used to compile that
+command. Only stand-alone C sources do not support this option, all
+others do. Try for example:
+<p>
+<pre>
+% ccube --version
+eclipse version: 3.6-11
+</pre><br><br></dd>
+<dt><b><a name="Software1">3.2. What is the numbering scheme for versions?</a></b></dt>
+<dd>The revision number is made of a major number, a minor number, and a
+micro number as: major.minor.micro. The major number is usually
+increased when lots of new functionalities are added for the user,
+usually support has been added for a new instrument or a major
+instrumental mode. The minor number increases every time we think the
+release has reached a stable level and can be released on the Web. The
+micro level indicates more or less a patchlevel. It is incremented
+very often, every time a non-negligible amount of work has been
+brought to the current version.<br><br></dd>
+<dt><b><a name="Software2">3.3. <b>eclipse</b> does not compile on my station!</a></b></dt>
+<dd><b>eclipse</b> is supported on the following platforms:
+<p>
+<ul>
+	<li>Solaris 2.5 and 2.6</li>
+	<li>HPUX 10.20 and 11</li>
+	<li>Linux 2.X</li>
+</ul>
+<p>
+The actual requirements to compile <b>eclipse</b> are that the system must
+be POSIX-compliant, have the <TT>mmap()</TT> system call (POSIX.1b
+compatibility), and... have an ANSI C compiler.
+<p>
+See the <tt>INSTALL</tt> file in the base <b>eclipse</b> directory for
+troubleshooting the installation.<br><br></dd>
+<dt><b><a name="Software3">3.4. Is it Ok to compile eclipse on a machine and run the binaries on
+another?</a></b></dt>
+<dd>In general no, you should avoid doing so.
+<p>
+The problem with cross-compilation (i.e. compiling the binaries on one
+machine and running them on another) is that there are a number of
+parameters which are determined at compile-time. These parameters are then
+assumed constant by all binaries derived from the eclipse libraries. If
+they happen to change because the machine on which you are running eclipse
+has undergone drastic changes (switch from 32-bit to 64-bit, processor
+or OS upgrade, etc.), or because you are running the binaries on a
+secondary platform, you are running the risk of getting unexplained core
+dumps at best, file corruption without warning at worst.
+<p>
+It is possible to move some parameter checks from compile-time to run-time,
+but that would bring serious performance issues and is not a good solution.
+A compiler usually optimizes the compiled code for the platform it is
+running on. If you really want to do cross-compilation, you should use
+dedicated cross-compilers or specific switches which are meant to do that.
+<p>
+The main recommendation would be: if you want to run eclipse on a given
+machine, compile it locally. The source code is distributed for that
+purpose.<br><br></dd>
+<dt><b><a name="Software4">3.5. I get some warnings during compilation</a></b></dt>
+<dd>Please just ignore any kind of warning during compilation. They are
+mostly due to differences between compiler tolerances about what each of
+them considers as ANSI C. They are harmless. Real bugs are usually
+detected by more sophisticated tools!
+<p>
+If you compile eclipse using <tt>gcc -Wall</tt> you are likely to get a
+family of warnings for which we can do nothing about (functions defined and
+never used, etc.). No need to report these warnings, we get them too and
+try to minimize the number of such messages.<br><br></dd>
+<dt><b><a name="Software5">3.6. The <TT>*.fits</TT> issue</a></b></dt>
+<dd>The same problem seems to be reported over and over again about eclipse
+commands that accept jokers on the command-line, like:
+<p>
+<pre>
+dfits *.fits
+is_ghost *.fits
+ado_refits *.fits
+stcube *.fits
+</pre>
+<p>
+Or even worse:
+<p>
+<pre>
+dfits */*.fits
+is_ghost */*.fits
+</pre>
+<p>
+The problem is not really in the eclipse command, but in the shell
+itself.  Whenever you type '*.fits' on the command-line, the shell
+expands it to a list of files and feeds it into the command. Example:
+<p>
+You have <TT>a.fits</TT>, <TT>b.fits</TT> and <TT>c.fits</TT> in the
+current directory. Typing:
+<p>
+<pre>
+is_ghost *.fits
+</pre>
+<p>
+will actually be sent to the command as if you had typed:
+<p>
+<pre>
+is_ghost a.fits b.fits c.fits
+</pre>
+<p>
+Problem is: the maximum character length for a command-line is limited
+to 512 characters (or something like that, but a fixed length) on many
+Unix systems, which means that if the list of FITS files is longer than
+that, the list will be truncated. To be convinced, try out the
+following: replace the eclipse command name by 'echo' and have a look at
+what you get:
+<p>
+<pre>
+echo *.fits
+echo */*.fits
+</pre>
+<p>
+The result is that the list does not contain all the file names. This
+usually makes eclipse command barf with a stupid error message.
+<p>
+A solution is to provide the file names one by one by making use of the
+'find' command (present on all Unix platforms). Example:
+<p>
+<pre>
+find . -name \*.fits -exec is_ghost {} \;
+</pre>
+<p>
+Use of the backslashes is important, it prevents the shell from
+expanding <TT>*.fits</TT> to the actual list.
+<p>
+You can also use the shell 'foreach' command under csh/tcsh:
+<p>
+<pre>
+foreach i (*.fits)
+foreach? is_ghost $i
+foreach? end
+</pre>
+<p>
+There are similar mechanisms under bash, sh, ksh, and other Unix shells.
+Have a look at your Unix shell documentation to learn how to loop on a
+large number of file names.<br><br></dd>
+</dl>
+<hr><h2>4. Tips</h2>
+<dl>
+<dt><b><a name="Tips0">4.1. grepfits</a></b></dt>
+<dd><pre>
+If you are through typing:
+<B>% dfits *.fits | fitsort keyword1 keyword2 ...  keywordn</B>
+<p>
+You can set the following alias in csh or tcsh:
+<p>
+<B>alias grepfits 'dfits *.fits | fitsort \!*'</B>
+<p>
+Type the above line exactly as it appears here. Now you can do:
+<p>
+<B>% grepfits keyword1 keyword2 ... keywordn</B>
+</pre><br><br></dd>
+<dt><b><a name="Tips1">4.2. Sorting out files</a></b></dt>
+<dd>It is possible to sort out the files in the output of <TT>fitsort</TT>
+to make them appear by date.
+<p>
+<pre>
+To make them appear by Unix file creation date (most recent first):
+<B>% dfits `ls -1t *.fits` | fitsort keyword1 ... keywordn</B>
+<p>
+To make them appear by FITS date (assuming in is found in the DATE keyword):
+<B>% difts *.fits | fitsort DATE keyword1 ... keywordn | sort -k 2</B>
+</pre><br><br></dd>
+<dt><b><a name="Tips2">4.3. Using eclipse commands as Unix filters</a></b></dt>
+<dd>It is possible to redirect the output of most <b>eclipse</b> commands
+to the stdout stream, making them efficient Unix filters. On most Unix
+systems, there is a device called <tt>/dev/stdout</tt> that is bound
+to your local terminal's stdout. It is enough to declare to an
+<b>eclipse</b> command that the name of the output file is
+<tt>/dev/stdout</tt> to redirect all data output to this stream.
+<p>
+Example:
+<p>
+% ccube "a.fits 2 *" /dev/stdout > b.fits
+<p>
+This trick can be used to process data on one machine and output the
+results to another one (e.g. on a Beowulf cluster). If you have the
+correct settings for rsh, you can try:
+<p>
+Assuming machine1 and machine2 are two machines on which you have
+accounts, and they trust each other (your .rhosts file or similar must
+be properly configured):
+<p>
+machine1% ccube "a.fits 2 *" /dev/stdout | rsh machine2 "cat > b.fits"
+<p>
+This command loads the file a.fits, multiplies all its pixels by 2,
+then sends the results to its stdout, they are caught by the pipe and
+redirected to an rsh command. This remote command running on machine2
+uses cat to catch all data coming from its stdin and re-direct it to a
+file called b.fits on machine2.
+<p>
+Unfortunately, it looks like the <tt>/dev/stdout</tt> device does not
+exist on all Unixes. If that is the case for you, you can still declare the
+ouput file name to be <tt>STDOUT</tt>. eclipse will recognize this name and
+dump all outputs to the stdout steam instead of saving to a file.<br><br></dd>
+</dl>
+<p><hr size="4"></p>
+
+<p><a href="../index.html">Back to <b>eclipse</b> home page</a></p>
+
+<address>
+Contact: eclipse-team at eso dot org
+</address>
+
+</body>
+</html>
+

@@ -1,0 +1,241 @@
+.TH filt 1 "16 October 2000"
+.SH NAME
+filt \- apply a digital filter in spatial domain
+.SH SYNOPSIS
+.B filt
+[parameters] <in> [out]
+.SH DESCRIPTION
+.PP
+filt is a cube filter in image domain. Choose the kind of filter you want to
+apply, the resulting cube will be a filtered (plane by plane) version of
+the input cube.
+.SH PARAMETERS
+.TP
+.BI \-f " name " or " " \--filter " name"
+Choose the filter to apply. Supported filters are:
+.B user-linear, dx, dy, d2x, d2y, contour1, contour2,
+.B contour3, contrast1, min, max, median, max-min, user-morpho.
+Find their descriptions below. 
+.TP
+.BI \-p " 'f1 ... f9'" or " " \--val " 'f1 ... f9'"
+To be used with filters 'user-linear' or 'user-morpho', to provide 9
+values to define the filter. All 9 values are given enclosed in single
+quotes, separated by one or more blank characters.
+.TP
+.BI \-k " hs" or " " \--khsize " hs"
+To be used only with the flat filter. hs is the half-size of the kernel (1
+for a 3x3 kernel, 2 for a 5x5, ...).
+.SH ALGORITHM
+.PP
+In image processing, there are numerous ways to filter an image. This
+collection of filters all remain in the spatial domain. The basic idea
+is to convolve the image with a 3x3 or 5x5 kernel. For bigger kernels,
+it is often less time-consuming to go to Fourier space with an FFT.
+.br
+If we describe a 3x3 neighborhood as :
+.PP
+pix1	pix2	pix3
+.br
+pix4	pix5	pix6
+.br
+pix7	pix8	pix9
+.PP
+The new pixel will be a linear combination of pix1 to pix9. The
+combination is then normalized by dividing by the sum of all coeficients,
+except for NULL sums where no normalization is applied.
+.PP
+new = a1.pix1 + a2.pix2 + ... + a9.pix9
+.br
+('.' denoting multiplication).
+.PP
+An example is a low-pass filter defined by the set of 9 coefficients :
+.PP
+1 1 1
+.br
+1 1 1
+.br
+1 1 1
+.PP
+The derivative in x axis can be computed by applying :
+.PP
+\-1	0	1
+.br
+\-1	0	1
+.br
+\-1	0	1
+.PP	
+And so on. See image processing books for more details about
+digital filtering in spatial domain !
+If you choose a user-defined filter, you get prompted for 9 values,
+that are the coefficients described above.
+.PP
+For morphological filters, the idea remains the same, except that
+pix1 to pix9 are sorted before combination, that is :
+.PP
+new = a1.min(pix1, .., pix9) + ... + a9.max(pix1, ..., pix9)
+.PP
+The well-known median filter is then simply described by the coefficients :
+.br
+0  0  0  	0  1  0 	0  0  0 
+.br
+That is, each pixel is replaced by the median value of its neighborhood.
+Due to this necessary sorting on every pixel, morphological filters
+are usually very computer-intensive.
+.SH IMPLEMENTED FILTERS
+.TP
+.B user-linear 
+Enter 9 values for a 3x3 linear filter, through the \-p or \--val option.
+.TP
+.B mean3 
+All coefficients equal to 1
+.TP
+.B dx
+X derivative. Filter coefficients are:
+.PP
+\-1 0 1
+.br
+\-1 0 1
+.br 
+\-1 0 1
+.TP
+.B dy 
+Y derivative. Filter coefficients are:
+.br
+\-1 \-1 \-1
+.br
+ 0  0  0
+.br
+ 1  1  1
+.TP
+.B d2x 
+X second derivative. Filter coefficients are:
+.br
+ 1 \-2  1
+.br
+ 1 \-2  1
+.br
+ 1 \-2  1
+.TP
+.B d2y 
+Y second derivative. Filter coefficients are:
+.br
+ 1  1  1
+.br
+\-2 \-2 \-2
+.br
+ 1  1  1
+.TP 
+.B contour1 
+Contour detector. Filter coefficients are:
+.br
+ 1  0 \-1
+.br
+ 0  0  0
+.br
+\-1  0  1
+.TP
+.B contour2 
+Another contour detector. Filter coefficients are:
+.br
+\-1  0  1
+.br
+ 2  0 \-2
+.br
+\-1  0  1
+.br
+.TP
+.B contour3 
+Yet another contour detector. Filter coefficients are:
+.br
+\-1  2 \-1
+.br
+ 0  0  0
+.br
+ 1 \-2  1
+.TP
+.B contrast1 
+Contrast enhancement. Filter coefficients are:
+.br
+ 1  1  1
+.br
+ 1  4  1
+.br
+ 1  1  1
+.TP
+.B mean5 
+Low-pass (smearing) filter. All coefficients are set to 1 on a 5x5
+neighborhood.
+.TP
+.B min 
+Morphologival minimum. Filter coefficients are (from min to max) :
+.br
+1 0 0   0 0 0   0 0 0
+.TP
+.B max 
+Morphological maximum. Filter coefficients are (from min to max) :
+.br
+0 0 0   0 0 0   0 0 1
+.TP
+.B median 
+Morphological median. Filter coefficients are (from min to max) :
+.br
+0 0 0   0 1 0   0 0 0
+.TP
+.B max-min 
+Morphological max-min. Filter coefficients are (from min to max) :
+.br
+\-1 0 0   0 0 0   0 0 1
+.TP
+.B user-morpho 
+Provide 9 values for a 3x3 morphological filter, through the \-p or
+\--val option.
+.TP
+.B flat
+This filter applies an NxN convolution with a matrix filled with ones only.
+This is a low-pass filter. The size of the convolution kernel to use can be
+set through the \-k or \--khsize option. Example: calling a flat filter with the
+option \-k 2 will filter the image with a 5x5 kernel containing only ones
+everywhere. The computation time increases tremendously with the kernel
+size, it is not recommended to use too large kernels.
+.SH FILES
+.PP
+Input files shall all comply with FITS format.
+.PP
+The original FITS header  of the input FITS file
+is conserved along, except for the following keywords:
+NAXIS, NAXISn, BITPIX, BSCALE, BZERO, which are related to the
+newly created file.
+.PP
+HISTORY keywords are appended to the FITS header to indicate the
+eclipse process modifications.
+.PP
+The output file naming scheme is: *.fits becomes *.filter.fits.
+.SH EXAMPLES
+.PP
+To apply an x derivative to a file named 'in.fits', do:
+.br
+.B filt
+\--filter dx in.fits
+.br
+the created output file is named 'in.dx.fits'.
+.PP
+To apply a median filter to a file named 'm51.fits', do:
+.br
+.B filt
+\--filter median m51.fits
+.br
+the created output file is named 'm51.median.fits'/
+.PP
+To apply a user-defined morphological filter to 'sofi.fits':
+.br
+.B filt
+\--filter user-morpho --val '1 0 0 0 1 0 0 0 1' sofi.fits
+.PP
+To apply a flat low-pass filter with a 21x21 kernel to a file
+named 'm51.fits', do:
+.br
+.B filt
+\--filter flat --khsize 10 m51.fits
+.SH SEE ALSO
+.PP
+.B fft, ccube 

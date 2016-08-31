@@ -1,0 +1,65 @@
+
+eclipse documentation
+---------------------
+
+The eclipse source code is documented directly in the .h and .c files.
+Documentation in the sources follows the conventions set by doxygen.
+
+Before going any further, it is recommended to download doxygen and read
+carefully its (short) documentation. The conventions used to document
+eclipse code are described hereafter. Get the latest doxygen version
+from  http://www.doxygen.org
+
+Conventions used by doxygen are almost identical to the JavaDoc
+conventions, which means that if doxygen ever dies, it should still be
+possible to locate some similar software to produce documentation.
+
+Documentation is produced in eclipse/doc/reference
+in:
+
+html/ for the HTML doc
+latex/ for the Latex doc
+
+Generating the documentation
+----------------------------
+
+Type:
+% doxygen eclipse.dox
+
+
+Documentation conventions
+-------------------------
+
+All functions, typedefs, global variables, defines and modules must be
+documented. Standard documentation templates can be found in the 'forge'
+module inside the same CVS repository as eclipse.
+
+Here is an example:
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Integer image constructor.
+  @param    lx      Size in x.
+  @param    ly      Size in y.
+  @return   1 newly allocated intimage.
+ 
+  Allocates the main pointer and the pixel buffer, and returns the newly
+  allocated object. The returned image must be deallocated using
+  intimage_del().
+ */
+/*--------------------------------------------------------------------------*/
+
+
+Allocated memory and documentation
+----------------------------------
+
+Functions that allocate memory and return a pointer to the allocated zone
+MUST explicitly describe in their documentation how the pointer is supposed
+to be deallocated. This can be as simple as "the returned pointer must be
+deallocated using free()", but can also refer to object destructors. If the
+returned pointer points to a statically allocated zone, this must be
+indicated in the function documentation also. Freeing a statically
+allocated pointer is a sure way of producing a core dump.
+
+
+--

@@ -1,0 +1,67 @@
+<html>
+<title>thresh man page</title>
+<body>
+<pre>
+Name
+       thresh - threshold a cube/image to another cube/image or pixel map
+
+Synopsis
+       thresh [options] &lt;in&gt; [out]
+
+Description
+       thresh  uses  the  same  operation (thresholding) to give two different
+       kind of results.  To get rid of peaks in a cube  for  example  (impulse
+       noise,  etc.),  just  give  it the minimum and maximum values you want.
+       Values out of this interval are clipped to the given extremums.  Pixels
+       lying in the interval remain unchanged.
+
+       You  can  clip  values outside an interval to specified values by using
+       the -c and -C options.
+
+       In binary mode, the input must be a single image, and the output  is  a
+       binary  image set to 1 for a pixel lying in the interval and 0 outside.
+       Use it to fix bad pixel maps from a linear gain image for example.
+
+       Default mode is : thresholding to normal pixel values.
+
+       Default output name for file infile.fits is infile.thr.fits
+
+Options
+       -b or --binary
+              Changes mode to binary. Input cube must  have  only  one  image,
+              output is a pixel map.
+
+       -h or --highcut value
+              Fixes the high cut value.
+
+       -l or --lowcut value
+              Fixes the low cut value.
+
+       -c or --assignlow pixelvalue
+              assigns  a  value for pixels which lie under lowcut. Defaults to
+              lowcut itself.
+
+       -C or --assignhigh pixelvalue
+              assigns a value for pixels which lie above highcut. Defaults  to
+              highcut itself.
+
+Examples
+       To  threshold  all  values outside the interval [12 ; 5000] in the file
+       in.fits, you would use:
+
+       &gt; thresh -l 12 -h 5000 in.fits
+       Output file in this case is in.thr.fits
+
+       To set all values outside the interval [15 ; 1200] to  0  in  the  file
+       in.fits, and to output it into a file named thd.fits, you would use:
+
+       &gt; thresh -l 15 -c 0 -h 1200 -C 0 in.fits thd.fits
+
+Files
+       Input files shall all comply with FITS format.
+
+See Also
+       flat
+</pre>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<html>
+<title>ado_pl man page</title>
+<body>
+<pre>
+Name
+       ado_pl - simple Adonis pipeline
+
+Synopsis
+       ado_pl [options]
+
+Description
+       ado_pl is an Adonis specific command. It handles all basics of sky-sub-
+       traction, flat-field division and bad pixel correction. It needs one or
+       several  data  cubes containing both sky and object planes, and option-
+       ally a flat-field and a bad pixel map.  ado_pl is very specific to Ado-
+       nis in the way it recognizes how data are organized in the file. It can
+       be used with other data, however, provided they are separated  into  an
+       object and a sky file.
+
+       The 2 supported data formats are:
+
+       Data  has  been acquired by offseting the telescope. Sky and object are
+       provided in separated files. This is the  SEPARATED  functioning  mode,
+       which  algorithm  is  described  below.  Use  the  -a and -s options to
+       declare the object and sky file names.
+
+       Chopping has been done, with whatever acquisition pattern. This is  the
+       PACKED  functioning mode, algorithm described below.  Use the -p option
+       to declare the packed cube name.
+
+       If acquisition does not match any of these schemes, make the  best  use
+       of extract and catcube to reformat data into an acceptable format.
+
+       Once  the sky has been correctly subtracted, the user may want to flat-
+       field the result and/or correct the bad pixels. These calibration  data
+       must  have been prepared before, and are provided through the -f (flat-
+       field) and -b (bad pixel map) options on command line.
+
+       As usual, a flat-field is a linear gain map which mean value is 1.0, it
+       shows  the pixel-to-pixel response of the detector.  A bad pixel map is
+       in standard eclipse format: an 8-bit FITS file, with pixel value  of  1
+       for good pixels and 0 for bad ones.
+
+Algorithm
+       1. SEPARATED DATA
+
+       The algorithm is:
+
+       * Average the sky to sky_avg
+       * Subtract sky_avg from each plane in the object cube
+       * Average the sky-subtracted object if requested.
+       * Append results to the output cube
+
+       2. PACKED DATA
+
+       Data is acquired in cycles of object/sky. The algorithm is:
+
+       * Extract every cycle in the cube. For each cycle:
+       * Extract all sky planes in this cycle
+       * Average the sky planes to one: sky_avg
+       * Subtract sky_avg from all object planes in cycle
+       * Average the resulting sky-subtracted object planes if requested
+       * Append results to the output cube
+
+       The  output will have one plane per cycle in the initial cube. No aver-
+       age is made on the output, for  it  may  need  some  shift-and-add,  or
+       selection,  or  wiser  averaging.  Make  use  of other eclipse tools to
+       reduce this cube to one image.
+
+Options
+       -p  filename
+              to declare a packed cube name, in PACKED data mode only.
+
+       -a  filename
+              to declare an object filename, in SEPARATED data mode only.
+
+       -s  filename
+              to declare a sky filename, in SEPARATED data mode only.
+
+       -o  filename
+              to declare an output filename, any mode. Default is  calib.fits.
+
+       -f  filename
+              to  declare  a  flat-field  file name to use with this data. The
+              output planes will all be divided by this image. PACKED or SEPA-
+              RATED mode.
+
+       -b  filename
+              to  declare a bad pixel map file name to use with this data. The
+              output planes will all be bad pixel  corrected  using  this  bad
+              pixel  map.   The  default  behaviour  is: look for a file named
+              ’badpixmap’ in current directory, which fits the  usual  eclipse
+              format for pixel maps, and use it. If this file is not available
+              or the -b option was not used, do not correct  for  bad  pixels.
+              PACKED or SEPARATED mode.
+
+       -1     1  (one) requests an average of object frames to a single frame.
+              In the case of SEPARATED data, it is equivalent to averaging all
+              object frames to a single one. In the case of PACKED data, it is
+              equivalent to outputting one plane per cube cycle.
+
+Example
+       For a PACKED input cube named f0118.fits, with the following cycle key-
+       words in its FITS header:
+       NAXIS3 = 240
+       OJ_N_SEQ = 30
+       OJ_N_IMA = 4
+       OB_CYCL = 01
+
+       Requesting  a  processing with option -1 active will create one average
+       object frame per cycle, i.e. 30 frames. Without this option on, it will
+       create one object frame per input object frame, i.e. 120.
+
+Files
+       Input files shall all comply with FITS format.
+
+See Also
+       arcube, cstcube, average, flat, norm, deadpix, shiftadd
+
+Author
+       N. Devillard -- ESO
+</pre>
+</body>
+</html>

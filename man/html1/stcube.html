@@ -1,0 +1,72 @@
+<html>
+<title>stcube man page</title>
+<body>
+<pre>
+Name
+       stcube - cube statistics
+
+Synopsis
+       stcube [options] &lt;cubes...&gt;
+
+Description
+       stcube gives basic statistics about each plane in a cube. It is used to
+       have a quick look at what kind of data is in the cube.
+
+       The display looks like :
+
+       #--------------------------------------------------
+       # FILE stdstar_check.fits
+       # PLANE  MIN   MAX      MEAN      MEDIAN    STDEV
+         0001   -287  9709.33  15.0937   0.833328  228.504
+       #--------------------------------------------------
+
+       For each plane:
+
+       MIN is the minimum value.
+
+       MAX is the maximum value.
+
+       MEAN is the average pixel value.
+
+       MEDIAN is the median pixel value.
+
+       STDEV is the standard deviation.
+
+       There is one display for each FITS file given on command line.   stcube
+       accepts jokers on command line :
+       &gt; stcube *.fits
+
+Options
+       -b or --badpixmap filename
+              give a bad pixel map to take into account when computing statis-
+              tics on the cube.
+
+       -z or --zone ’llx lly urx ury’
+              To compute statistics only on a rectangular zone in the  images.
+              The  zone  is  specified  by  indicating  the coordinates of the
+              lower-left and upper-right corners of the rectangle. Borders are
+              inclusive.   The  coordinate  system  is  the  one used by FITS,
+              namely that the lower left pixel in the image is labelled (1,1),
+              x-axis  increasing  from  left  to right, y-axis increasing from
+              bottom to top.
+
+       -s or --stdev &lt;name&gt;
+              To compute a standard deviation frame (only), with name  &lt;name&gt;.
+              This  mode  of  stcube  accepts  only one input file name, which
+              should correspond to the name of a 3d FITS file or a valid ASCII
+              list (i.e. a data cube). The input cube is processed to obtain a
+              frame that is giving the standard deviation of all pixels  along
+              time.  If  several  input names are provided, only the first one
+              will be taken into account.
+
+Examples
+       To compute the standard deviation frame named ’stdev.fits’ from a  cube
+       named ’cube.fits’, you would use:
+       &gt; stcube --stdev stdev.fits cube.fits
+
+       To  compute  statistics  on  the  lower left quadrant only of a 256x256
+       image, you would use:
+       &gt; stcube --zone ’1 1 128 128’ image.fits
+</pre>
+</body>
+</html>

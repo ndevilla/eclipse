@@ -1,0 +1,146 @@
+<html>
+<title>peak man page</title>
+<body>
+<pre>
+Name
+       peak - peak measurements
+
+Synopsis
+       peak [options] image.fits
+
+Description
+       peak detects localizes bright object centroids in an image. It takes as
+       argument a list of FITS cube names and outputs on stdout the center  of
+       each detected bright zone, an estimation of FWHM in x and y, an average
+       FWHM, a flux estimation, and  the  minimum  and  maximum  pixel  values
+       around each object.
+
+       Two  different  detection method can be used with the peak command: the
+       ’kappa-sigma’ method (default) or the  ’squares’  method  (use  the  -m
+       (--method) option to choose).
+
+       With  the ’kappa-sigma’ method, bright objects are detected if and only
+       if they contain a peak of sufficient amplitude i.e. more than K  devia-
+       tions  above  the  median  image  value, AND if they cover a surface at
+       least of 3x3 pixels.  To detect peaks located in a window smaller  than
+       3x3,  there  is  an  option to smear out the image by a low-pass filter
+       before applying peak detection, but of course it has  associated  draw-
+       backs.   By  default,  peak  will be looking at all the signal which is
+       more than 2 deviations above the median pixel value. This value can  be
+       changed using the -k (or --kappa) option.  Notice that this is not more
+       than kappa-sigma clipping for signal detection, except  that  to  avoid
+       mis-estimation  of  the  mean and sigma in crowded fields, the measure-
+       ments are done with the median and a deviation  which  is  the  average
+       absolute distance to the median.
+
+       In  the  ’square’  method,  a standard deviation filter is apply to the
+       image, which has the effect to  make  the  bright  points  appear  like
+       squares. This squares image is then used as a mask to detect objects.
+
+       In spite of calls to morphological filters, peak is surprisingly faster
+       than other usual algorithms. It should be used as a peak position esti-
+       mator more than a precise locator, though.
+
+Algorithms
+       Kappa-sigma method
+
+       If  smearing  is  activated, the input image is smeared out with a low-
+       pass 5x5 filter before detection is applied. This filtered  version  of
+       the  input  image  is only used for detection purposes, and not for any
+       kind of later measurement.
+
+       A binary map is first created of all pixel positions which have a value
+       above a given threshold (by default, median plus 2 deviations).
+
+       A  binary  morphological  erosion, and a dilation are then performed on
+       the binary map to close all regions smaller than 3x3, which removes all
+       isolated  bad pixels. If smearing was applied, small objects would have
+       been enlarged to bigger than 3x3 and appear in the resulting pixel map.
+
+       A  floodfill  algorithm  is applied to find the geometric center of all
+       white blobs, weighted by pixel values taken from the original image.
+
+       Squares method
+
+       A standard deviation filter is applied to  the  image  which  make  the
+       bright  objects  appaear like bright squares. This bright squares image
+       is then binarized and used as  a  mask  to  identify  zones  where  the
+       objects  are  in  the  original  image. A morphological closing is then
+       applied, and the remaining objects are registered.
+
+       For both methods, if fine positioning is  activated  (-f  or  --finepos
+       option),  a subsequent process is called, which requests 3 user-defined
+       radiuses in pixels: r1, r2, and r3. For each found peak position in the
+       image,  a  background is computed as the median pixel value in the ring
+       centered on the estimated peak position, of radiuses r2 and r3. Then  a
+       barycenter  is  computed  within the disk centered on the same spot, of
+       radius r1, using background-subtracted pixel values  as  weights.  This
+       fine  positioning  method proves quite reliable, but requires all peaks
+       in the image to have more or less the same size to fit into the circles
+       defined by r1, r2, r3.
+
+Options
+       -m clip or --method clip
+              Use ’kappa-sigma’ detection method.
+
+       -m squares or --method squares
+              Use ’squares’ detection method.
+
+       -k cut or --kappa cut
+              To  be used for ’kappa-sigma’ method.  Use this option to change
+              the cut level in a factor of deviations. The lower  this  value,
+              the  more  bright  zones may be detected. The higher this factor
+              is, the less detected peaks. The default of 2.0  seems  to  work
+              fine on images having a high Signal to Noise Ratios.
+
+       -s  or  --smear
+              This  option  (low-pass filter) applies a 5x5 convolution with a
+              flat kernel before trying to detect  objects.  The  smearing  is
+              h.PPful  to  detect objects which are smaller than a 3x3 window.
+              It increases the number of detections, but also  the  number  of
+              false  detections. Bad pixels, for example, are smeared out to a
+              5x5 window and detected as proper peaks. Another issue is that 2
+              close  peaks will be smeared out to a single one. Most probably,
+              the returned result will  be  a  barycenter  of  the  2  regions
+              instead  of  the  2  expected centers. Because the smearing will
+              lower the signal in all regions, the default sigma cut is halved
+              when this options is used.
+
+       -S or --sqhsize ’hx hy’
+              To  be  used for ’squares’ method.  Define the size of the stan-
+              dard deviation filter applied to generate the squares image. The
+              bigger the filter is, the bigger the squares are.
+
+       -f ’r1 r2 r3’ or --fpos ’r1 r2 r3’
+              Fine  positioning:  provide  three  values  r1  &lt;  r2 &lt; r3.  The
+              radiuses r2 and r3 specify a ring around  each  detected  point,
+              from  which  an  estimation  of  the  background is computed.  A
+              barycenter is then computed in the  disk  of  radius  r1,  using
+              background-subtracted  pixel  values as weights. No defaults are
+              given to these parameters.
+              Be aware when using this position refining that it  assumes  the
+              following conditions.
+
+       All  peaks  are  isolated, i.e. the closest distance between 2 peaks is
+       strictly greater than 2 * r3.
+
+       There is a background zone around every peak, always  within  the  disk
+       defined  by r2 and r3. Otherwise, the background estimation is contami-
+       nated with peak signals.
+
+       All peaks are contained in a disk of radius r1.
+
+       -F or --fwhm
+              Flag to print out the fhwm for detected objects.
+
+       -P or --phot ’r1 r2 r3’
+              Provides the radiuses used to compute photometry.
+
+       -d or --rtd
+              Flag to display detected objects in rtd.
+
+Bugs
+       Peaks located on an image edge will not be detected.
+</pre>
+</body>
+</html>

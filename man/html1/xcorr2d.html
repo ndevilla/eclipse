@@ -1,0 +1,46 @@
+<html>
+<title>xcorr2d man page</title>
+<body>
+<pre>
+Name
+       xcorr2d - Find offsets between frames of a cube.
+
+Synopsis
+       xcorr2d [options] &lt;in&gt;
+
+Description
+       xcorr2d  is used to detect offsets between frames of a cube.  This com-
+       mand is useful for jittered data sets, where the offsets between frames
+       have unfortunately not been saved together with the data files, or can-
+       not easily be derived from the FITS headers.
+
+       The algorithm makes  use  of  an  FFT-based  cross-correlation  between
+       frames to identify the offsets. This search is normally precise to +/-2
+       pixels in X and Y.
+
+       Several assumptions are made about the input data  set.   Input  images
+       must  be  larger  than  512x512,  otherwise there would probably not be
+       enough information for the  cross-correlation  method  to  work.  Input
+       images should only differ in shift, not in scale, not in rotation. They
+       should also not present too much offset or gain difference.
+
+       The algorithm expects all images to be compared to the first one in the
+       cube.  If  you  want  to  use  another reference, use the -r/--refplane
+       option.
+
+Options
+       -r or --refplane num
+              Specify which plane is to be taken as a reference.   This  plane
+              will have offset (0,0) by definition.
+
+Algorithm
+       Cross-correlation  is  performed on subsampled images in Fourier space,
+       so the results cannot be more precise than +/-2 pixels.
+
+Files
+       The input must be a cube. A cube can either be a FITS file with several
+       planes  (NAXIS==3  and  NAXIS3&gt;1)  or a list of frame names given in an
+       ASCII file.
+</pre>
+</body>
+</html>

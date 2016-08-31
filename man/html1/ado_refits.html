@@ -1,0 +1,74 @@
+<html>
+<title>ado_refits man page</title>
+<body>
+<pre>
+Name
+       ado_refits - reformat an Adonis FITS file to standard FITS
+
+Synopsis
+       ado_refits [options] &lt;FITS files...&gt;
+
+Description
+       ado_refits  is  used to ’reformat’ features in the cube header that may
+       not comply 100% with the FITS standard.  If time information is present
+       in the images, it is removed from the planes and written in the header.
+
+       Output files have the same name as input files,  but  no  leading  path
+       name. To overwrite files, use ado_refits in the directory where you put
+       your data files.  If you do not want to overwrite your files,  go  into
+       the directory where you want to put the new set of files, and fetch the
+       files by giving their complete path name.
+
+Options
+       -c     Convert HIERACH keywords to COMMENT. This is useful when dealing
+              with  ESO  FITS  files which contain this non-standard FITS fea-
+              ture.  ado_refits keeps the same header by default, and converts
+              these  keywords  to  COMMENTs  for compatibility with other FITS
+              readers.
+
+Examples
+       All files are in current directory, to overwrite them  with  reformated
+       data, just use:
+
+       ado_refits *.fits
+
+       All  files  are  in  directory  /dev/cdrom/adonis,  to output the newly
+       reformated files in /space/data, you would do:
+
+       % cd /space/data
+       % ado_refits /dev/cdrom/adonis/*.fits
+
+Files
+       Input files are in Adonis FITS format
+
+       Output files are (hopefully) FITS compliant. They do  not  contain  the
+       time  information  in  the  planes  anymore,  but  directly in the FITS
+       header.  Time information is added at the end, under HISTORY  keywords.
+       Use  the  dfits  utility to visualize them, output them to a text file,
+       etc.
+
+Bugs
+       The FITS reader implemented in eclipse has  been  enhanced  to  support
+       common  errors made in FITS writing. Nevertheless, these errors have to
+       be reported to the user, and they are in verbose mode. Reporting  these
+       FITS  errors to the originators of the files could help a lot improving
+       the quality of these files.
+
+       Typically, the most common reported error is:
+       *** Invalid format : using STRING
+       which is generated for illegal keyword values such as:
+       DOOR    = Opened
+       which should be:
+       DOOR    = ’Opened’
+
+       For more information, see the ’sci.astro.fits’ newsgroup,  or  get  the
+       file "Source of FITS information" at the following URL:
+
+       http://ssdoo.gsfc.nasa.gov/astro/fits/fits_home.html
+       (updated July 1996)
+
+Author
+       N. Devillard -- ESO
+</pre>
+</body>
+</html>

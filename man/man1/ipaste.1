@@ -1,0 +1,80 @@
+.TH ipaste 1 "25 Feb 1997"
+.SH NAME 
+ipaste \- paste an image into another 
+.SH SYNOPSIS
+.B ipaste
+[parameters] [options] frame insert [out] 
+.SH DESCRIPTION
+.PP
+.B ipaste
+inserts an image into another one.
+.I insert
+is the image to insert and
+.I frame
+the image which receives the insertion.
+Default output name is 'pasted.fits'.
+.PP
+.B ipaste
+requires 2 coordinates in the frame image referential, indicating the point
+where the first pixel of the insert image should be pasted. The image is
+then inserted in its original orientation. 
+.PP
+If the inserted image is too big to fit on right or top side, it is clipped
+to the frame image limits (
+.B ipaste
+outputs a warning).
+.PP
+Default is: insert image starting from lower left corner (1,1) of frame
+image.
+.PP
+Coordinates are referred to as in the FITS standard: lower left pixel
+is (1,1), x increasing from left to right and y increasing from bottom
+to top.
+.SH OPTIONS
+.TP
+.BI \-x " xpos"
+Defines x coordinate lower left corner of place to insert.
+Default is 1 (first column on left).
+.TP
+.BI \-y " ypos"
+Defines y coordinate lower left corner of place to insert.
+Default is 1 (first line on bottom).
+.SH EXAMPLE
+.PP
+The frame image is frame.fits, the inserted one is pad.fits,
+the output name being defaulted. Let frame.fits be
+of size 400x300, and pad.fits be 20x10. To insert
+pad.fits in the upper right corner of frame.fits, do:
+.br
+%
+.B ipaste
+\-x 380 -y 290 frame.fits pad.fits
+.br
+The output is named pasted.fits.
+.PP
+To insert pad.fits in upper left corner of frame.fits, do:
+.br
+%
+.B ipaste
+\-x 1 -y 290 frame.fits pad.fits
+.PP
+To insert in the center of the image, do:
+.br
+%
+.B ipaste
+\-x 190 -y 145 frame.fits pad.fits
+.SH FILES
+.PP
+Input/output files shall all comply with FITS format.
+.PP
+The original FITS header of the 'frame' FITS file
+is conserved along, except for the following keywords:
+NAXIS, NAXISn, BITPIX, BSCALE, BZERO, which are related to the
+newly created file.
+.PP
+HISTORY keywords are appended to the FITS header to indicate the
+eclipse process modifications, together with the command line which
+was used to generate the file.
+.SH SEE ALSO
+.PP
+.B extract

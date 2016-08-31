@@ -1,0 +1,54 @@
+.TH norm 1 "25 Feb 1997"
+.SH NAME
+norm \- normalize a cube/image
+.SH SYNOPSIS
+.B norm
+[options] <incube> [outcube] 
+.SH DESCRIPTION
+.LR
+.B norm
+is used to normalize a cube with respect to a unity pixel scale,
+a unity mean pixel value, a unity flux, or a unity absolute flux.
+.B norm
+can also scale all fluxes in a cube to a given value (see -f option)
+or to the flux of the first plane in the cube.
+.SH ALGORITHM
+.PP
+.B norm
+supports several normalization schemes. See options.
+.PP
+For a cube, the normalization is applied to each plane independently.
+.PP
+default output name for in.fits is in.norm.fits
+.SH OPTIONS
+.TP
+.B \-m " scale"
+normalizes pixel values so that the minimum value is 0.0 and the
+maximum is 1.0. All other pixel values are scaled accordingly.
+No use is made of the BSCALE and BZERO FITS keywords for this!
+This means that some pixel depth resolution is usually lost in
+this operation.
+.TP
+.B \-m " mean"
+normalizes pixel values so that the mean pixel value is 1.0.
+.TP
+.B \-m " flux"
+normalizes the image to a unity flux, i.e. divide the image by the
+sum of all pixel values.
+.TP
+.B \-m " aflux"
+normalizes the image to an absolute unity flux, i.e. divide the
+image by the sum of all absolute pixel values.
+.TP
+.B \-m " scaleflux"
+used with the -f option, this mode scales all plane fluxes to
+the parameter given with the -f option. Without this parameter,
+all plane fluxes are scaled according to the flux in the first
+plane of the input cube.
+.TP
+.B \-f " reqFlux"
+to be used with the "scaleflux" mode only. This parameter specifies
+to which flux value all planes fluxes have to be rescaled.
+.SH FILES
+.PP
+Input files shall all comply with FITS format.

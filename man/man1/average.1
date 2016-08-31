@@ -1,0 +1,97 @@
+.TH average 1 "29 Mar 2001"
+.SH NAME
+average \- cube averaging
+.SH SYNOPSIS
+.B average 
+[options] [parameters]
+.SH DESCRIPTION
+.PP
+.B average
+reduces a FITS cube over its third dimension, by applying one of several
+possible algorithms described below. Users should specify a cut and a
+method. The cut describes how planes in the input cube are grouped for
+averaging, the method specifies what kind of average is applied.
+.SH PARAMETERS
+.TP
+.BI \-i " <incube> " or " " \--in " <incube>"
+Specifies the name of the input cube (mandatory).
+.TP
+.BI \-o " <outcube> " or " " \--out " <outcube>"
+Specifies the name of the output cube (optional). Default output name
+for an input cube named
+.I incube.fits
+is 
+.I incube.avg.fits.
+.SH OPTIONS
+.PP
+Cuts
+.PP
+Cuts specify how to group the input planes to apply the average. Default
+cut is
+.I \--cut whole.
+.TP
+.BI \--cut " whole"
+applies the average on the whole cube, i.e. all planes are averaged to a
+single one according to the requested method.
+.TP
+.BI \--cut " cycle " \--step " <n>"
+applies the average for every
+.I "<n>"
+planes in the input cube. For example, if the input cube contains 50
+planes and this cut is specified with n=10, the planes will be averaged
+10 by 10 to produce one cube in output containing 5 planes.
+.TP
+.BI \--cut " running " \--halfwidth " <h>"
+Performs a running average: the output is a cube containing as many
+planes as the input cube. Each plane is the result of an average over
+an interval centered on the same plane in the input, plus or minus <h>
+planes. This means that central planes will be the average of 2h+1 input
+planes, and edge planes will be an average of between h+1 and 2h+1 input
+planes.
+.PP
+Example: the input cube has 6 planes, h=2. Brackets show where the
+central plane is at each iteration.
+.PP
+plane 1 is built from [1] 2  3
+.br
+plane 2 is built from  1 [2] 3  4
+.br
+plane 3 is built from  1  2 [3] 4  5
+.br
+plane 4 is built from     2  3 [4] 5  6
+.br
+plane 5 is built from        3  4 [5] 6
+.br
+plane 6 is built from           4  5 [6]
+.PP
+Methods
+.PP
+Methods specify how to perform the average. Default is linear.
+.TP
+.BI \--method " linear"
+Performs a normal, linear average of the input planes.
+.TP
+.BI \--method " sum"
+Same as linear, but does not divide by the number of averaged planes at
+the end. Useful for cubes which do not have much signal.
+.TP
+.BI \--method " median"
+Median filtering along the z-axis.
+.TP
+.BI \--method " filtered "
+with additional parameters
+.BI \--filt-low " npix"
+and
+.BI \--filt-high " npix".
+This is actually an extension of the median average. A time line is
+extracted for each pixel position on the detector (along the z-axis),
+and then sorted out. The median average would only keep the central
+value, whereas this method requests two numbers specifying how many
+low and high pixels shall be rejected before making an average.
+.SH FILES
+.PP
+Input files shall all comply with FITS format.
+.SH BUGS
+.PP
+It is not yet possible to combine a running filter cut with a filtered
+average method.

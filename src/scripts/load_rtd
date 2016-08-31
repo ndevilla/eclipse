@@ -1,0 +1,128 @@
+#!/bin/sh
+#\
+exec seqSh "$0" ${1+"$@"}
+#
+#
+# This script receives the name of a FITS image on the command-line as
+# a first argument. If an RTD session is already running, the image is
+# displayed in it. Otherwise a new RTD is launched to display the
+# images. There is no need to start up an rtdServer beforehand.
+#
+# Author: P. Biereichel
+# Modified: N. Devillard
+#
+#   SYNOPSIS
+#
+#        load_rtd filename <low-cut> <high-cut>
+#
+# --------------------------------------------------------------------
+
+proc usage { } {
+    puts "Usage: load_rtd filename <low-cut> <high-cut>"
+}
+
+proc log { msg } {
+    puts $msg
+}
+
+#
+# check command line arguments
+#
+proc check_args { } {
+    global argc argv argv0
+
+    if { $argc == 0 || $argc == 2} {
+        usage
+        exit 1
+    }
+
+    lassign $argv filename lcut hcut
+
+    #
+    # Use an absolute pathname for the file since RTD and this script
+    # may have been started from different directories.
+    #
+    if { "[file dirname $filename]" == "." } {
+        set filename [pwd]/$filename
+    }
+
+    if { ! [file isfile $filename] } {
+        log "cannot find regular file $argv0: aborting RTD load"
+        exit 1
+    }
+
+    # check that cut level parameters are numbers
+    if { $argc >= 3 } {
+        if { [catch {expr $lcut + $hcut + 1}] } {
+            usage
+            exit 1
+        }
+    }
+    return "$argc $filename $lcut $hcut"
+}
+
+#
+# connect to rtd
+#
+proc connect_Rtd { } {
+    global auto_path rtd_fd env
+    #
+    # the rtd library is on VLTROOT/lib/rtd
+    #
+    lappend auto_path $env(VLTROOT)/lib/rtd
+
+    if { [set rtd_fd [connect_to_rtd]] == 0 } {
+
+        log "could not connect to rtd: launching a new RTD session"
+        if { [catch {exec $env(VLTROOT)/bin/rtd &} msg] } {
+            log $msg
+            exit 1
+        }
+
+        # wait until rtd is ready (max. 10 seconds)
+        for {set i 0} {$i < 10} {incr i} {
+            if { [set rtd_fd [connect_to_rtd]] != 0 } { break }
+            after 1000
+        }
+
+        if { $rtd_fd == 0 } {
+            log "could not connect to RTD"
+            exit 1
+        }
+    }
+    return $rtd_fd
+}
+
+#
+# send a command to rtd
+#
+proc send_Rtd { cmd } {
+    global rtd_fd
+    if { [catch {send_to_rtd $rtd_fd $cmd} msg] } {
+        log $msg
+        exit 1
+    }
+    return $msg
+}
+
+#
+# starting here
+#
+lassign [check_args] nargs filename lcut hcut
+
+connect_Rtd
+
+#
+# Display image in already existing RTD session. Use the remote
+# access functions provided by the rtdimage subcommands
+# (see rtdimage(n)).
+#
+log "displaying $filename"
+send_Rtd "config -file $filename"
+
+if { $nargs >= 3 } {
+    send_Rtd "cut $lcut $hcut"
+}
+exit 0
+
+

@@ -1,0 +1,76 @@
+<html>
+<title>fft man page</title>
+<body>
+<pre>
+Name
+       fft - fft 2d on an image
+
+Synopsis
+       fft [options] &lt;in&gt; &lt;out&gt;
+
+Description
+       fft  computes a Fast Fourier Transform on an input image.  fft can also
+       compute an inverse FFT. Results can have swapped quadrants, and can  be
+       expressed in polar or cartesian coordinates.
+
+       Take  care  about  the formats : polar/cartesian and swapped/unswapped.
+       The default procedure is:
+
+       In input of a forward FFT, an image is required. It  is  taken  as  the
+       real part (in cartesian coordinates) of a complex 2d signal which imag-
+       inary part is set to zeros. The output of a forward FFT is a complex 2d
+       signal,  i.e.  2  image  planes. By default, the output is converted to
+       polar coordinates (modulus, phase), and then quadrants are  swapped  in
+       both  modulus  and  phase  to  put low frequencies at the center of the
+       images.  To prevent this default behaviour, use the -n and  -c  options
+       described below.
+
+       In  input of an inverse FFT, a cube containing 2 images is required. It
+       is taken as a complex 2d signal which first plane contains the  modulus
+       and  second  plane  contains  the phase. Before the inverse FFT is com-
+       puted, a swapping of quadrants occurs, and then a conversion to  carte-
+       sian  (real,  imaginary)  coordinates is performed. To prevent quadrant
+       swapping or cartesian conversion, use the -n and -c  options  described
+       below.
+
+       The output of an inverse FFT is a cube containing 2 images in cartesian
+       unswapped format, first one being the real part, second one  being  the
+       imaginary part (meaningless imagewise).
+
+Algorithm
+       fft uses the Danielson-Lanczos lemma, in a code based on one originally
+       written by N. M. Brenner, described in Numerical Recipes in C.
+
+Options
+       -c  or  --noconv
+              Switches to cartesian mode the following data:
+              output for a forward FFT (default is polar),  or  input  for  an
+              inverse FFT.
+
+       -i  or  --inverse
+              Inverse  FFT.  The  input  is a cube containing two planes only.
+              Default I/O format for these 2 planes is polar coordinates (mod-
+              ulus,  phase).  It  will  output  a cube containing 1 plane only
+              (imaginary part is meaningless imagewise).  The  input  will  be
+              swapped before FFT, unless the -n option is used.
+
+       -n  or  --noswap
+              This  option  prevents fft from swapping the output of a forward
+              FFT and the input of an inverse FFT.
+
+       -s  or  --swaponly
+              This option can be used to apply the swapping and quit.
+
+       Swapping is done according to the following rule :
+       1 2
+       4 3
+       becomes then
+       3 4
+       2 1
+       which puts then the lowest frequencies at the center of the image.
+
+Files
+       Input files shall all comply with FITS format.
+</pre>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<html>
+<title>norm man page</title>
+<body>
+<pre>
+Name
+       norm - normalize a cube/image
+
+Synopsis
+       norm [options] &lt;incube&gt; [outcube]
+
+Description
+       norm is used to normalize a cube with respect to a unity pixel scale, a
+       unity mean pixel value, a unity flux, or a unity absolute  flux.   norm
+       can also scale all fluxes in a cube to a given value (see -f option) or
+       to the flux of the first plane in the cube.
+
+Algorithm
+       norm supports several normalization schemes. See options.
+
+       For a cube, the normalization is applied to each plane independently.
+
+       default output name for in.fits is in.norm.fits
+
+Options
+       -m  scale
+              normalizes pixel values so that the minimum value is 0.0 and the
+              maximum  is  1.0. All other pixel values are scaled accordingly.
+              No use is made of the BSCALE and BZERO FITS keywords  for  this!
+              This  means  that some pixel depth resolution is usually lost in
+              this operation.
+
+       -m  mean
+              normalizes pixel values so that the mean pixel value is 1.0.
+
+       -m  flux
+              normalizes the image to a unity flux, i.e. divide the  image  by
+              the sum of all pixel values.
+
+       -m  aflux
+              normalizes  the image to an absolute unity flux, i.e. divide the
+              image by the sum of all absolute pixel values.
+
+       -m  scaleflux
+              used with the -f option, this mode scales all  plane  fluxes  to
+              the  parameter given with the -f option. Without this parameter,
+              all plane fluxes are scaled according to the flux in  the  first
+              plane of the input cube.
+
+       -f  reqFlux
+              to be used with the "scaleflux" mode only. This parameter speci-
+              fies to which flux value all planes fluxes have to be  rescaled.
+
+Files
+       Input files shall all comply with FITS format.
+</pre>
+</body>
+</html>

@@ -1,0 +1,6 @@
+#!/usr/bin/env eclipse
+if args.n<3 then
+	print("use: "..args[1].." <filename>")
+	exit(1)
+end
+print("median("..args[2]..")="..stats(load(args[2]))[1].median)

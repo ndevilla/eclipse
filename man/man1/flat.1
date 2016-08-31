@@ -1,0 +1,79 @@
+.TH flat 1 "12 April 1999"
+.SH NAME
+flat \- create linear gain maps out of twilight data cubes
+.SH SYNOPSIS
+.B flat
+[flags] <twilight> [basename]
+.SH DESCRIPTION
+.LR
+.B flat
+is used to process twilight data cubes to create linear gain maps and
+bad pixel maps. Twilight data cubes are a slowly increasing/decreasing
+signal that may be used to record pixels' responses. In this way, it is
+mainly possible to see which pixels have a linear response, in which
+domain, and if the response is linear, a simple regression gives the
+pixel gain, relative to the mean (or median) gain.
+.SH ALGORITHM
+.LR
+.B flat
+makes a computation of linear regression factors on every pixel,
+outputting the value of the fitted slope. The overall luminosity in
+each image is approximated by the median flux. This assumes a majority of
+pixels are valid, a valid assumption for standard detectors.
+.PP
+A rejection is applied on the time line to avoid taking into accounts
+stellar objects which are seen in twilight frames. This is done by
+applying a robust linear fit.
+.br
+Byproducts of this computation are the y-intercept map, an error map, a
+bad pixel map. So far, the only used criterion to declare a pixel as bad
+is to tag all pixels outside a [0.5, 2.0] gain interval as invalid. Some
+more criteria could be derived from a close study of the slope fit.
+.PP
+Output file names are all named according to a base name. The gain map
+is called base_flat.fits, the intercept map is base_intercept.fits, the
+error map is base_errmap.fits, the bad pixel map is base_badpix.fits.
+The base name is either given on the command-line after the input file
+name, or it can be omitted on the command-line. In that case, the input
+file base name (i.e. without .FITS or .fits extension) will be used.
+.PP
+A proportional fit (y=ax) can be requested instead of a full slope
+(y=ax+b), in which case no intercept map can be produced. The
+proportional fit will compute every possible value of y/x, then take the
+median one. This has been found to be quite robust.
+.PP
+If you provide a dark frame to subtract from all input twilight frames,
+the proportional fit mode will be activated automatically.
+.SH OPTIONS
+.TP
+.B \-o or \--intercepts
+Output a y-intercepts map. This is a byproduct of the slope fit (see
+above).
+.TP
+.B \-e or \--errmap
+Output an error map from the linear fit. This image contains for each
+pixel the residual sum of squared errors for all fitted points.
+.TP
+.B \-b or \--pixmap
+Output a bad pixel map. This is a byproduct of the gain map. All pixels
+outside of a fixed [0.5, 2.0] (inclusive) interval are tagged as bad.
+The output is a pixel map (i.e. a FITS file). If you are not satisfied
+with these threshold settings, use 
+.B thresh
+to set other thresholds on the gain map.
+.TP
+.B \-p or --prop
+Instead of trying to fit a full slope (y=ax+b), only a proportional
+slope (y=ax) will be fitted. This option will be activated when dark
+subtraction is requested.
+.TP
+.BI \-d " filename or " \--dark " filename"
+Provide a dark frame to subtract from all input twilight frames. Check
+that the dark frame you provide uses the same exposure time as the
+twilight frames. Proportional fit is activated in that case.
+.SH FILES
+.PP
+Input files shall all comply with FITS format.
+.SH SEE ALSO
+.PP
+.B thresh, deadpix

@@ -1,0 +1,34 @@
+<html>
+<title>speedtest man page</title>
+<body>
+<pre>
+Name
+       speedtest - CPU test for image processing
+
+Synopsis
+       speedtest
+
+Description
+       speedtest  performs  several classical image processing operations, and
+       reports the time spent on CPU. The following tests are applied:
+
+       uniformly distributed noise generation
+       filtering by 3x3 kernel convolution
+       filtering by 5x5 kernel convolution
+       median filtering with 3x3 kernel
+       statistics computation
+       fast fourier transform
+       resampling by a zoom factor of 2.0
+
+       speedtest starts by generating an image containing noise only, and then
+       performs  all the above operations on this image, and outputs CPU times
+       for each test. CPU times are given for the total time  in  seconds  and
+       the  average  per  pixel  time in microseconds. The total and per pixel
+       time are given for all the tests.
+
+       Notice that the given time values are only estimations, since they  are
+       based  on  wall  clock  time,  not  on CPU time. Your results will vary
+       depending on the machine workload.
+</pre>
+</body>
+</html>

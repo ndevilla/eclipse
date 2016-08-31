@@ -1,0 +1,68 @@
+<html>
+<title>ipaste man page</title>
+<body>
+<pre>
+Name
+       ipaste - paste an image into another
+
+Synopsis
+       ipaste [parameters] [options] frame insert [out]
+
+Description
+       ipaste  inserts  an  image  into  another  one.  insert is the image to
+       insert and frame the image which receives the insertion.  Default  out-
+       put name is ’pasted.fits’.
+
+       ipaste  requires 2 coordinates in the frame image referential, indicat-
+       ing the point where the first pixel  of  the  insert  image  should  be
+       pasted. The image is then inserted in its original orientation.
+
+       If  the  inserted  image  is too big to fit on right or top side, it is
+       clipped to the frame image limits ( ipaste outputs a warning).
+
+       Default is: insert image starting from lower left corner (1,1) of frame
+       image.
+
+       Coordinates  are  referred to as in the FITS standard: lower left pixel
+       is (1,1), x increasing from left to right and y increasing from  bottom
+       to top.
+
+Options
+       -x xpos
+              Defines  x  coordinate  lower  left  corner  of place to insert.
+              Default is 1 (first column on left).
+
+       -y ypos
+              Defines y coordinate lower  left  corner  of  place  to  insert.
+              Default is 1 (first line on bottom).
+
+Example
+       The frame image is frame.fits, the inserted one is pad.fits, the output
+       name being defaulted. Let frame.fits be of size 400x300,  and  pad.fits
+       be  20x10.  To insert pad.fits in the upper right corner of frame.fits,
+       do:
+       % ipaste -x 380 -y 290 frame.fits pad.fits
+       The output is named pasted.fits.
+
+       To insert pad.fits in upper left corner of frame.fits, do:
+       % ipaste -x 1 -y 290 frame.fits pad.fits
+
+       To insert in the center of the image, do:
+       % ipaste -x 190 -y 145 frame.fits pad.fits
+
+Files
+       Input/output files shall all comply with FITS format.
+
+       The original FITS header of the ’frame’ FITS file is  conserved  along,
+       except  for  the  following  keywords:  NAXIS,  NAXISn, BITPIX, BSCALE,
+       BZERO, which are related to the newly created file.
+
+       HISTORY keywords are appended  to  the  FITS  header  to  indicate  the
+       eclipse process modifications, together with the command line which was
+       used to generate the file.
+
+See Also
+       extract
+</pre>
+</body>
+</html>

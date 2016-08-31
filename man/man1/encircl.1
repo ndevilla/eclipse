@@ -1,0 +1,62 @@
+.TH encircl 1 "04 Dec 96"
+.SH NAME
+encircl \- Encircled Energy Computation 
+.SH SYNOPSIS
+.B encircl
+[options] <cubes> <parameters>
+.SH DESCRIPTION
+.PP
+.B encircl
+computes the encircled energy for every plane in a cube given
+on command line. See ALGORITHM to know how it is computed.
+.B encircl
+needs to be given some parameters in order to work. These parameters are 
+the approximate position of the peak on which the user wants to find 
+encircled energy radius, as well as the percentage of the total energy for
+which the radius is wanted.   
+.SH ALGORITHM
+.PP
+For each image in each cube (candidate image), the following algorithm
+is applied:
+.PP
+1. Check the validity of the window.
+.PP
+2. Find the position of the pixel of maximum intensity and re-center the
+window on that pixel.
+.PP
+3. Calculate the energy encircled in the 100 % radius and multiply it
+by the percentage of the total energy for which the radius is wanted.
+.PP
+4. Calculate the encircled energy for every radius from 1 pixel to the
+100 % radius and store the results in an array.
+.PP
+5. Look up the array to find the two entries whose values are nearest 
+to that corresponding to the percentage of interrest of the total energy. 
+.PP
+6. Use a linear interpolation to find more precisely what the radius is.
+.SH OPTIONS
+.TP
+.BI \-p " Plate Scale"
+Plate scale in arc-seconds per pixel, for an output in arc-seconds.
+.TP
+.BI \-r " Radius"
+To override the hard coded size of the 100 % energy radius (1.4").
+.TP
+.BI \-h " half-size"
+To override the default 20 pix value of the window half size.
+.SH EXAMPLE
+.PP
+To determine the radius for which the encircled energy is 50 % of the total 
+encircled energy for an star whose energy we know to be located in a window 
+of 42x42 pixels roughly centered on pixel 60,60 of image star.fits with a 
+plate scale of 0.1" we want to set the 100 % energy radius to 1.1"  
+use:
+.PP
+.B encircl
+-h 21 -p 0.1 -r 1.1 star.fits 60 60 50
+.SH FILES
+.PP
+Files shall all comply with FITS format
+.SH SEE ALSO
+.PP
+stcube, strehl

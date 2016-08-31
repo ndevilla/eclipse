@@ -1,0 +1,105 @@
+.TH wdat 1 "25 Feb 1997"
+.SH NAME 
+wdat \- read DAT tapes in Adonis format
+.SH SYNOPSIS
+.B wdat
+[-d device] [-h] [-nr] [-l]
+.if n .ti +5n
+[-l= file] [-fits] [-log]
+.if n .ti +5n
+[-e= file] [-e MASK] [-s= file]
+.if n .ti +5n
+[-s= MASK] [-q]
+.SH DESCRIPTION
+.LP
+.B wdat
+reads DAT tapes written in Adonis format. The Unix tar format is almost
+universal, but is not that convenient. It is especially delicate to get
+anything out of a tape which had a problem. To prevent this, the Adonis
+format uses separate files for each data cube. In case of tape damage,
+it is most likely that just one file would be lost instead of all files
+after the damaged location. Another nice thing is that files can be read
+on the fly and thus deliver information to the user as soon as it is read.
+.LP
+.B wdat
+accepts many options on command-line. Use them to indicate which device
+you read the tape from, which files you want to include/exclude, if
+you only want to get a list of files, if you want to be notified before
+downloading a file, etc. Check below.
+.SH OPTIONS
+.TP
+.BI \-d " device"
+where device is the Unix name of the DAT reader on your machine. It is
+most often something like /dev/nrst0 or the like. Default value is the
+content of the TAPE environment variable.
+.TP
+.BI \-h
+Gives help about
+.I wdat
+.TP 
+.BI \-nr
+Does not rewind the tape before first access.
+.TP
+.BI \-l
+list option, only lists DAT contents on terminal.
+.TP
+.BI \-l= " listfile"
+list option, only lists DAT contents to file 'listfile'.
+.TP
+.BI \-fits
+Skips files if they are not FITS files.
+.TP
+.BI \-log
+Automatically translates logfiles (.LOG) from OS-9.
+.TP
+.BI \-e= " exfile"
+exclude option, will exclude from downloading all files which name has
+been matched in exfile.
+.TP
+.BI \-e " MASK"
+will exclude all files matching the mask. A mask is a simple character
+string, all file names containing this string will be excluded.
+.TP
+.BI \-s= " selfile"
+select option, will select for downloading all files which name has been
+matched in selfile.
+.TP
+.BI \-s " MASK"
+will load all files matching the mask. A mask is a simple character string,
+only file names containing this string will be loaded.
+.TP
+.BI \-q
+query option, will request user confirmation before any download of a file.
+.SH FILES
+.LP
+Selected/excluded files are simple plain ASCII files containing file
+names you want to select/exclude in the following format: names are written
+plainly in ASCII, and are separated by carriage returns (other normal
+separators would work as well).
+.SH EXAMPLE
+.LP
+First, get the list of all files on the tape from a device named /dev/nrst0:
+.br
+wdat -d /dev/nrst0 -l= mylistfile
+.br
+Then edit the file to download only the files you wish to,
+with any text editor. Extra white spaces are not important. The selection
+file shall look like:
+.LP
+ADONISFILE_0001.FITS
+.br
+ADONISFILE_0002.FITS
+.br
+\&.\.\.
+.br
+.LP
+Then, to download only these:
+.br
+wdat -d /dev/nrst0 -s= mylistfile
+.SH BUGS
+.LP
+To be reported as soon as possible to the author:
+.br
+Francois Lacombe, Observatoire de Paris-Meudon.
+.br
+e-mail : Francois.Lacombe@obspm.fr

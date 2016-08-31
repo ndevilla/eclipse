@@ -1,0 +1,35 @@
+.TH speedtest 1 "07 Sep 2000"
+.SH NAME
+speedtest \- CPU test for image processing 
+.SH SYNOPSIS
+.B speedtest
+.SH DESCRIPTION
+.PP
+.B speedtest
+performs several classical image processing operations, and reports the
+time spent on CPU. The following tests are applied:
+.PP
+uniformly distributed noise generation
+.br
+filtering by 3x3 kernel convolution
+.br
+filtering by 5x5 kernel convolution
+.br
+median filtering with 3x3 kernel
+.br
+statistics computation
+.br
+fast fourier transform
+.br
+resampling by a zoom factor of 2.0
+.PP
+.B speedtest
+starts by generating an image containing noise only, and then performs
+all the above operations on this image, and outputs CPU times for each
+test. CPU times are given for the total time in seconds and the average
+per pixel time in microseconds. The total and per pixel time are given
+for all the tests.
+.PP
+Notice that the given time values are only estimations, since they are
+based on wall clock time, not on CPU time. Your results will vary depending
+on the machine workload.

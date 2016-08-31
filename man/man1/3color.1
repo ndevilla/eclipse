@@ -1,0 +1,25 @@
+.TH 3color 1 "19 May 1998"
+.SH NAME 
+3color \- 3 color combination 
+.SH SYNOPSIS
+.B 3color
+<red> <green> <blue> <outname>
+.SH DESCRIPTION
+.PP
+.B 3color
+combines three FITS images of equal size to a single 24 bit image in PPM
+format. All input files are first scaled to 256 gray levels before
+conversion to a single 24 bit image file.
+.PP
+Example:
+.br
+> 3color h2.fits feII.fits brg.fits orion.ppm
+.SH OPTIONS
+.PP
+None
+.SH FILES
+.PP
+Input files shall all comply with FITS format. The output file is in PPM
+(Portable PixMap) format, which should be fairly easy to convert to any
+kind of more convenient image format for export. As PPM images are
+portable, they are bulky and usually not suitable for export.

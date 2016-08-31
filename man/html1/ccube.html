@@ -1,0 +1,166 @@
+<html>
+<title>ccube man page</title>
+<body>
+<pre>
+Name
+       ccube - cube/image computer
+
+Synopsis
+       ccube [options] &lt;arithmetic_expression&gt; [outcube]
+
+Description
+       ccube  is  a  calculator  which allows operation between cubes, between
+       cubes and constants, and also between constants (for  the  same  price,
+       you won a wonderful on-line calculator).
+
+Expressions
+       Arithmetic  expressions  support both standard and polish reverse nota-
+       tion operations. Be careful however, that  to  avoid  all  ambiguities,
+       FITS  files given in an expression are only identified by the fact that
+       they contain a "fits" or "FITS" extension (suffix), or if they are pre-
+       fixed  with  an  arobas  (@).  All other symbols will be interpreted as
+       numerical operators or operands. This is mainly due to avoid  conflicts
+       between operands/operators and Unix file names. Examples: the slash (/)
+       is both a division sign and the root directory, "1/2" may be the result
+       of  the  division of 1 by 2, or a file named ’2’ located in a directory
+       named ’1’, and so on.
+
+       See the following paragraphs for a detailed  description  of  supported
+       expressions and operators.
+
+Polish Reverse Notation (prn)
+       Int  this  mode  (default)  all  arithmetic  expressions use the Polish
+       Reverse Notation (PRN).
+
+       An arithmetic expression must be provided enclosed in quotes.
+
+       Separate arguments by spaces. "2 1+" is invalid, "2 1 +" is Ok.
+
+       Cube arguments are names which contain "fits" or "FITS", or any charac-
+       ter  string which begins with an arobas ’@’. The arobas is stripped and
+       the rest of the string is taken as an input file name. e.g. to  compute
+       with  a  file  named ’b012’, give as argument ’@b012’ in the arithmetic
+       expression.
+
+       Possible arithmetic operations are: addition (+), subtraction (-), mul-
+       tiplication (*), division (/), exponentiation (^), logarithm (l).
+
+       Operands  are  processed from left to right. e.g. to divide an image by
+       2, the order is "image.fits 2 /".
+
+       Two cubes may be added/subtracted/multiplied/divided if and only if:
+       1. They have the same number of planes:
+       The operation is repeated plane by plane: plane n of first  cube  oper-
+       ates with plane n of second cube.
+       2. The second cube has only one plane:
+       The  operation  is  repeated on all planes of first cube, with the only
+       plane in second cube.
+
+       All operators are binary. To use the minus ’-’ as unary operator,  sub-
+       tract from zero (see examples below).
+
+       A  logarithm  (l)  is  also  considered as a binary operator. Its first
+       argument is the object which logarithm will be taken, the second  argu-
+       ment (cannot be omitted) is the logarithm base (cannot be a cube!).
+
+Standard Arithmetic Expressions
+       Use  the  -s  or --standard option to input standard arithmetic expres-
+       sions.
+
+       The possible operators are as above:  addition  ’+’,  subtraction  ’-’,
+       multiplication  ’*’,  division  ’/’, exponentiation ’^’, logarithm ’l’.
+       To these, add the possibility to use parentheses ’(’ and ’)’ to enforce
+       operator  priority. The operator priority is given below, in decreasing
+       order of priority:
+
+       exponentiation
+       logarithm
+       multiplication and division (same priority level)
+       addition and subtration (same prioriry level)
+
+       Blanks are stripped off before processing an arithmetic expression,  so
+       feel free to make notations clear by adding some.
+
+       As  in  PRN  above, file names are identified as character strings con-
+       taining ’fits’ or ’FITS’, or any character string containing an  arobas
+       ’@’.  The  arobas is stripped and the rest of the string is taken as an
+       input file name e.g. to compute with a file named ’b012’, give as argu-
+       ment ’@b012’ in the arithmetic expression.
+
+Examples
+       All  the following examples are given first in PRN and then in standard
+       notation.
+
+       To compute: out.fits = in.fits * 2
+       &gt; ccube "in.fits 2 *" out.fits
+       &gt; ccube -s "in.fits * 2" out.fits
+
+       To compute: out.fits = (obj.fits - sky.fits) / ff.fits
+       &gt; ccube "obj.fits sky.fits - ff.fits /" out.fits
+       &gt; ccube -s "(obj.fits - sky.fits)/ff.fits" out.fits
+
+       To compute: out.fits = (obj1 + obj2)/2
+       &gt; ccube "@obj1 @obj2 + 2 /" out.fits
+       &gt; ccube -s "(@obj1 + @obj2) / 2" out.fits
+       &gt; ccube -s "(@obj1+@obj2)/2" out.fits
+
+       To compute the log in base 10 of an image named ’image.fits’, type:
+       &gt; ccube "image.fits 10 l" out.fits
+       &gt; ccube -s "image.fits l 10" out.fits
+
+       To compute the square of an image: out.fits = in.fits ^ 2
+       &gt; ccube "in.fits 2 ^" out.fits
+       &gt; ccube -s "in.fits^2" out.fits
+
+       To exponentiate an image, e.g. out.fits = 1.01 ^ input_im
+       &gt; ccube "1.01 @input_im ^" out.fits
+       &gt; ccube -s "1.01 ^ @input_im" out.fits
+
+       Here is an example showing that PRN does not use parentheses:
+
+       &gt; ccube -s "(2*3) + 2*(4*(1+2))"
+       is equivalent to:
+       &gt; ccube "2 3 * 2 1 + 4 * 2 * +"
+
+       With images:
+       "(obj.fits - sky.fits) / (ff.fits - dark.fits)"
+       Becomes:
+       "obj.fits sky.fits - ff.fits dark.fits - /"
+
+       Invalid syntax with PRN may be due to lack of separators:
+       "1 3+" and "1 2 3 +*" are invalid.
+       "1 3 +" and "1 2 3 + *" are Ok.
+
+       In standard notation, it is Ok to stack operators, as long as there  is
+       no ambiguity ("1 2" differs from "12" !):
+       "1+3" and "1*(2+3)" are ok.
+
+       With  PRN,  invalid syntax may be returned if some objects are still on
+       the stack when no operator remains. The following:
+       "@im1 @im2 2 *" will cause an error message, because an object (im1) is
+       still on the stack after all operators have been used.
+
+       To  use  the minus ’-’ as unary operator to negate an image subtract it
+       from zero:
+       out = - in
+       is given as:
+       &gt; ccube "0 @in -" out
+       &gt; ccube -s "0-@in" out
+
+Options
+       --polish or -p
+              Polish reverse notation for arithmetic expressions. This is  the
+              default.
+
+       --standard or -s
+              Standard notation for arithmetic expressions.
+
+Files
+       Input files shall all comply with FITS format.
+       Default output file name is ’comp.fits’.
+
+Bugs
+       Unary operators are not supported, they should.
+</pre>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<html>
+<title>poisson man page</title>
+<body>
+<pre>
+Name
+       poisson - random 2d poisson point generator
+
+Synopsis
+       poisson [options]
+
+Description
+       poisson  generates  random points on a 2d plane with a Poisson law dis-
+       tribution.  The idea is to generate random points with  an  homogeneous
+       distribution  within the rectangle. The algorithm is simple: points are
+       generated randomly within the given limits, points are rejected if they
+       are  too  close  to  any previously generated point. Once the requested
+       number of points has been generated, output the  point  coordinates  to
+       stdout.
+
+       The  minimum  distance between points is computed by the following for-
+       mula:
+
+       If the requested rectangle has a width of L and a height of  h,  and  n
+       points are requested, we have:
+
+       dmin = sqrt(L*h / 2*n)
+
+       The  defaults  are the following : rectangle is located between -75 and
+       +75 in x and y, points are generated with  integer  coordinate  values,
+       and 20 points will be generated.
+
+Options
+       -r xmin xmax ymin ymax
+              Defines  the rectangle in which points will be generated. Ranges
+              may be given as integer or floating-point values.
+
+       -f     Generate floating-point valued coordinates (default is integer).
+
+       -n     Change the number of points to generate. Default is 20.
+
+       -h hom Used to specify an homogeneity factor
+
+Bugs
+       This  is  the  simplest possible implementation of a Poisson generator.
+       As a result, trying to generate a high number  of  points  (&gt;500)  will
+       require  a very intensive random point generation before having all the
+       requested points. Another approach would be to generate  random  points
+       only within an allowed surface, but this is far from trivial.
+</pre>
+</body>
+</html>

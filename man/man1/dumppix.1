@@ -1,0 +1,37 @@
+.TH dumppix 1 "31 Mar 2000"
+.SH NAME 
+dumppix \- dump pixels from a FITS image/cube to stdout 
+.SH SYNOPSIS
+.B dumppix
+[-s rate] [-x col] [-y lin] image.fits
+.SH DESCRIPTION
+.PP
+.B dumppix
+dumps pixel values from a FITS file to stdout in a format that can be
+read by gnuplot to display surfaces for example. As an image may
+contain too many pixels for useful surface display, a subsampling factor
+may be applied before dumping pixels (see -s option).
+.PP
+Upon request,
+.B dumppix
+can only output the content of one line or one column instead of the
+whole image (see -x and -y options).
+.SH OPTIONS
+.TP
+.BI \-s " rate"
+Applies a brutal subsampling rate in x and y on the pixels before
+dumping.  Default is set to 1 (all pixels). Setting this to 2 would
+skip 1 pixel out of 2 in each direction, for example.
+.TP
+.BI \-x " col"
+Output only the contents of column "col". The subsampling rate can
+also be applied here. The convention for pixel positions is FITS: x
+goes from 1 to NAXIS1.
+.TP
+.BI \-y " lin"
+Output only the contents of line "lin". The subsampling rate can
+also be applied here. The convention for pixel positions is FITS: y
+goes from 1 to NAXIS2.
+.SH FILES
+.PP
+Input files can be images, cubes, or ASCII lists.

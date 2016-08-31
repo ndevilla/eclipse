@@ -1,0 +1,195 @@
+<html>
+<title>filt man page</title>
+<body>
+<pre>
+Name
+       filt - apply a digital filter in spatial domain
+
+Synopsis
+       filt [parameters] &lt;in&gt; [out]
+
+Description
+       filt  is  a  cube filter in image domain. Choose the kind of filter you
+       want to apply, the resulting cube will be a filtered (plane  by  plane)
+       version of the input cube.
+
+Parameters
+       -f name or --filter name
+              Choose  the filter to apply. Supported filters are: user-linear,
+              dx, dy, d2x, d2y, contour1, contour2, contour3, contrast1,  min,
+              max,  median,  max-min,  user-morpho.   Find  their descriptions
+              below.
+
+       -p ’f1 ... f9’or --val ’f1 ... f9’
+              To be used with filters ’user-linear’ or ’user-morpho’, to  pro-
+              vide  9  values  to  define  the  filter. All 9 values are given
+              enclosed in single quotes, separated by one or more blank  char-
+              acters.
+
+       -k hsor --khsize hs
+              To be used only with the flat filter. hs is the half-size of the
+              kernel (1 for a 3x3 kernel, 2 for a 5x5, ...).
+
+Algorithm
+       In image processing, there are numerous ways to filter an  image.  This
+       collection  of filters all remain in the spatial domain. The basic idea
+       is to convolve the image with a 3x3 or 5x5 kernel. For bigger  kernels,
+       it is often less time-consuming to go to Fourier space with an FFT.
+       If we describe a 3x3 neighborhood as :
+
+       pix1 pix2 pix3
+       pix4 pix5 pix6
+       pix7 pix8 pix9
+
+       The  new pixel will be a linear combination of pix1 to pix9. The combi-
+       nation is then normalized by dividing by the sum  of  all  coeficients,
+       except for NULL sums where no normalization is applied.
+
+       new = a1.pix1 + a2.pix2 + ... + a9.pix9
+       (’.’ denoting multiplication).
+
+       An example is a low-pass filter defined by the set of 9 coefficients :
+
+       1 1 1
+       1 1 1
+       1 1 1
+
+       The derivative in x axis can be computed by applying :
+
+       -1   0    1
+       -1   0    1
+       -1   0    1
+
+       And  so  on.  See image processing books for more details about digital
+       filtering in spatial domain !  If you choose a user-defined filter, you
+       get prompted for 9 values, that are the coefficients described above.
+
+       For  morphological filters, the idea remains the same, except that pix1
+       to pix9 are sorted before combination, that is :
+
+       new = a1.min(pix1, .., pix9) + ... + a9.max(pix1, ..., pix9)
+
+       The well-known median filter is then simply described  by  the  coeffi-
+       cients :
+       0  0  0   0  1  0   0  0  0
+       That  is,  each  pixel is replaced by the median value of its neighbor-
+       hood.  Due to this necessary sorting on every pixel, morphological fil-
+       ters are usually very computer-intensive.
+
+Implemented Filters
+       user-linear
+              Enter  9 values for a 3x3 linear filter, through the -p or --val
+              option.
+
+       mean3  All coefficients equal to 1
+
+       dx     X derivative. Filter coefficients are:
+
+       -1 0 1
+       -1 0 1
+       -1 0 1
+
+       dy     Y derivative. Filter coefficients are:
+              -1 -1 -1
+               0  0  0
+               1  1  1
+
+       d2x    X second derivative. Filter coefficients are:
+               1 -2  1
+               1 -2  1
+               1 -2  1
+
+       d2y    Y second derivative. Filter coefficients are:
+               1  1  1
+              -2 -2 -2
+               1  1  1
+
+       contour1
+              Contour detector. Filter coefficients are:
+               1  0 -1
+               0  0  0
+              -1  0  1
+
+       contour2
+              Another contour detector. Filter coefficients are:
+              -1  0  1
+               2  0 -2
+              -1  0  1
+
+       contour3
+              Yet another contour detector. Filter coefficients are:
+              -1  2 -1
+               0  0  0
+               1 -2  1
+
+       contrast1
+              Contrast enhancement. Filter coefficients are:
+               1  1  1
+               1  4  1
+               1  1  1
+
+       mean5  Low-pass (smearing) filter. All coefficients are set to 1  on  a
+              5x5 neighborhood.
+
+       min    Morphologival minimum. Filter coefficients are (from min to max)
+              :
+              1 0 0   0 0 0   0 0 0
+
+       max    Morphological maximum. Filter coefficients are (from min to max)
+              :
+              0 0 0   0 0 0   0 0 1
+
+       median Morphological  median. Filter coefficients are (from min to max)
+              :
+              0 0 0   0 1 0   0 0 0
+
+       max-min
+              Morphological max-min. Filter coefficients are (from min to max)
+              :
+              -1 0 0   0 0 0   0 0 1
+
+       user-morpho
+              Provide  9 values for a 3x3 morphological filter, through the -p
+              or --val option.
+
+       flat   This filter applies an NxN convolution with a matrix filled with
+              ones  only.  This is a low-pass filter. The size of the convolu-
+              tion kernel to use can be set through the -k or --khsize option.
+              Example:  calling a flat filter with the option -k 2 will filter
+              the image with a 5x5 kernel containing only ones everywhere. The
+              computation time increases tremendously with the kernel size, it
+              is not recommended to use too large kernels.
+
+Files
+       Input files shall all comply with FITS format.
+
+       The original FITS header  of the input FITS file  is  conserved  along,
+       except  for  the  following  keywords:  NAXIS,  NAXISn, BITPIX, BSCALE,
+       BZERO, which are related to the newly created file.
+
+       HISTORY keywords are appended  to  the  FITS  header  to  indicate  the
+       eclipse process modifications.
+
+       The output file naming scheme is: *.fits becomes *.filter.fits.
+
+Examples
+       To apply an x derivative to a file named ’in.fits’, do:
+       filt --filter dx in.fits
+       the created output file is named ’in.dx.fits’.
+
+       To apply a median filter to a file named ’m51.fits’, do:
+       filt --filter median m51.fits
+       the created output file is named ’m51.median.fits’/
+
+       To apply a user-defined morphological filter to ’sofi.fits’:
+       filt --filter user-morpho --val ’1 0 0 0 1 0 0 0 1’ sofi.fits
+
+       To  apply  a  flat  low-pass filter with a 21x21 kernel to a file named
+       ’m51.fits’, do:
+       filt --filter flat --khsize 10 m51.fits
+
+See Also
+       fft, ccube
+</pre>
+</body>
+</html>

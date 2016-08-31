@@ -1,0 +1,34 @@
+.TH extract_spec 1 "19 Nov 2002"
+.SH NAME 
+extract_spec \- extract a spectrum 
+.SH SYNOPSIS
+.B extract_spec
+-i infile [options] [-o outfile]
+.SH DESCRIPTION
+.PP
+.B extract_spec
+extracts an horizontal spectrum from an image and subtract to it an
+estimation of the sky contribution. This sky estimation is done using a
+background zone that can be specified by the user. The user can also
+specify the spectrum width. The spectrum position in pixels has to be
+specified by the user.
+.PP
+The extracted spectrum is displayed with gnuplot.
+.SH OPTIONS
+.TP
+.BI \-p " pos " or " " \--spec\_p " pos"
+pos is the spectrum position in pixels, 1 being the bottom of the image.
+.TP
+.BI \-w " width " or " " \--spec\_w " width"
+Spectrum width in pixels.
+.TP
+.BI \-d " dist " or " " \--sky\_d " dist"
+dist is the gap in pixels between the spectrum and the zone used to
+estimate the background.
+.TP
+.BI \-W " width " or " " \--sky\_w " width"
+width is the width of the zone used to estimate the backgound (use 0 if you
+do not one any background correction).
+.TP
+.BI \-n " " or " " \--nograph 
+This flag is to be used to switch the plot off.

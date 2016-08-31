@@ -1,0 +1,44 @@
+<html>
+<title>distortion man page</title>
+<body>
+<pre>
+Name
+       distortion - Distortion estimation
+
+Synopsis
+       distortion [options]
+
+Description
+       distortion  estimates the distortion (vertical lines curvature or hori-
+       zontal lines curvature) by using images with bright curved lines  along
+       x  or  y. The distortion is fitted as a 2nd degree 2d polynomial repre-
+       senting either the distortion along x or y. This polynomial  is  stored
+       in a TFITS table that can be used as is by the warping command.
+
+Algorithm
+       The  input file is an ASCII file containing either one image name (with
+       several curved lines) or a list of images (with in  each  one  or  more
+       curved  lines). The command begins by averaging the list of files.  The
+       arcs are then detected, their shape is precisely extracted, fitted, and
+       a  general  fit is then computed to obtain the final 2d polynomial. The
+       arcs can be horizontal or vertical, but this has to be  specified  with
+       the -O option (1 for vertical arcs, 0 for horizontal arcs).
+
+Options
+       -i input
+              input is the name of the input ASCII file.
+
+       -o output
+              output is the name of the output TFITS table.
+
+       -O orientation
+              orientation  is 1 if the curved arcs are vertical and 0 if hori-
+              zontal.
+
+
+       SEE ALSO
+
+       warping
+</pre>
+</body>
+</html>

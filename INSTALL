@@ -1,0 +1,332 @@
+eclipse installation instructions
+_________________________________
+
+To compile and run eclipse commands, you need to download
+the eclipse library package called 'eclipse-main'.
+Additional instrumental packages are optional.
+
+
+
+	Installing eclipse-main
+	-----------------------
+
+	Get the eclipse-main-X.Y.Z.tar.gz package from the eclipse
+	web site. Unzip and untar anywhere you want.
+
+	Change dir to eclipse-X.Y.Z. Type:
+	% ./configure
+	% make
+	
+	You may now want to set some environment variables for eclipse.
+	A program called 'e_setup' helps you doing that. Type:
+	
+	% bin/e_setup
+
+	And answer the few questions to set up a file called .eclipse-rc
+	in your HOME directory. Make sure this file is sourced by your
+	environment.
+	
+
+
+	Installing additional packages
+	------------------------------
+
+	Additional (optional) instrument packages are called
+	eclipse-INS-X.Y.Z.tar.gz, where INS stands for one of
+	the supported instruments. These must be untarred in the
+	same directory as the eclipse main library to be compiled.
+
+	Example: you want to install the eclipse-isaac package,
+	you must unpack one directory above eclipse.
+
+	% ls -l
+	eclipse -> eclipse-5.0.0/
+	eclipse-isaac-5.0.0.tar.gz
+
+	% gunzip -c eclipse-isaac-5.0.0.tar.gz | tar xvf -
+	[...]
+	% cd eclipse
+	% make
+
+	This should do it.
+	Notice that you can install as many optional packages
+	as you want. Typing 'make' in the eclipse top directory
+	will build all found packages.
+	
+
+Troubleshooting
+---------------
+
+
+	* Trouble with 'make'
+	
+	To compile eclipse, you need a bug-less version of the 'make'
+	utility and that is apparently hard to find. The default 'make'
+	delivered with HPUX (any version) is full of bugs and may crash
+	while trying to compile eclipse. The 'make' utility on Dec-Alpha
+	workstations has also been reported to crash when trying to
+	compile eclipse.
+
+	If you experience problems with your 'make' command, you should
+	download and install the GNU make utility called 'gmake', which
+	can be found on any GNU mirror site (there are thousands such
+	sites through the world, the closest to you is probably in a
+	building next to you). Installing GNU make on your workstation
+	will save you some trouble not only with eclipse but also with any
+	kind of software you might have to compile later, so do yourself a
+	favour and update your workstation with this tool as soon as you
+	can.
+
+	Notice that the default 'make' utility on VLT-compliant
+	workstations *is* already a GNU make, so you do not need to care
+	about this.
+
+	* Trouble compiling the code
+
+	If all you get are warnings, there is no problem.
+
+	Compilation errors are a sure sign of something going wrong.
+	Either your compiler is not ANSI, or your machine has not
+	been correctly recognized. The best way is to identify an
+	ANSI C compiler on your machine and the options it needs
+	to compile C. Modify then the file called:
+	eclipse/config.make
+	and change the settings to your local compiler. Try again
+	until it works. If you really get into trouble and cannot
+	find support locally, send an e-mail to eclipse-team@eso.org
+	and we will try to help you out.
+
+
+
+	Specifying the compiler to use
+	------------------------------
+
+	If you have several C compilers installed on your machine
+	(e.g. cc, acc, gcc), you can specify which one you want 
+	to use at the 'configure' step. eclipse currently recognizes
+	only two types of compiler: 'cc' and 'gcc', whatever these
+	names refer to on your machine. Default is to try to use
+	the program called 'cc'.
+
+	You might want to force compilation with gcc. The way to do it
+	is:
+
+	% configure --with-gcc
+
+	Similarly, if you experience trouble compiling with gcc, you can
+	force compilation with the local cc compiler (default). The way to do
+	it is:
+
+	% configure --with-cc
+
+	If you think there are bugs in the code, you can always try to
+	compile in debug mode. The following should work:
+
+	% configure --debug
+
+	Last, if your compiler is not called 'cc' or 'gcc' you can
+	edit the file eclipse/config.make and set your
+	compiler name and options by hand.
+
+
+	Using eclipse
+	-------------
+
+	Since eclipse offers Unix commands, you want to set up your
+	environment so that all eclipse commands are in your executable
+	path, i.e. you can call them at any time without referring to the
+	directory they live in.
+
+	You also want to add eclipse man pages to your MANPATH variable, so
+	that you can request eclipse manual pages at any time with the
+	standard 'man' command. eclipse manual pages live in section 1 (user
+	commands) of the 'man' directory tree.
+
+	Last, eclipse offers the following parameters to be configured
+	through environment variables (only):
+
+	- E_VERBOSE			verbose mode
+	- E_DEBUG			debug mode
+	- E_TMPDIR			name of the temporary swap space directory
+	- E_LOGFILE			name of an optional log file
+
+	Starting from version 4.0, eclipse does not require anymore the
+	definition of E_MAXMEM and E_MAXSWAP. These variables are not read
+	anymore from environment variables, but automatically set.
+
+	Let us detail what these variables should be:
+
+	Since eclipse version 4.0, you need to give a value to E_VERBOSE and
+	E_DEBUG. In previous versions, it was enough to declare these variables
+	to activate verbose or debug mode. The value of these variables now has
+	a meaning. To activate verbose, you must set E_VERBOSE to a non-zero
+	value like: "setenv E_VERBOSE 1". To deactivate verbose, you can either
+	unset the variable or set it to zero, like:
+	% unsetenv E_VERBOSE
+	% setenv E_VERBOSE 0
+
+	* E_VERBOSE needs to be set to any non-zero value to trigger verbose
+	  mode in all eclipse commands.
+	  "verbose" means output messages related to the algorithmic
+	  behaviour of the current eclipse command.
+
+	* E_DEBUG needs to be set to any non-zero value to trigger debug
+	  mode in all eclipse commands.
+	  "debug" means output messages related to the pure software
+	  behaviour of the current eclipse command (memory allocation
+	  status, files opened, etc.). This mode is only intended for
+	  eclipse developers, but you might want to activate it to get more
+	  details about what is going on, especially in case of fatal
+	  failure to make a complete bug report.
+
+	* E_TMPDIR declares the directory where temporary swap files should
+	  be created. As a default (if this variable is not set), files will
+	  be created in '.', the current working directory. The more you have
+	  free disk space in that directory, the more eclipse will be able to
+	  create temporary swap space to extend your machine's memory.
+	  Indicate any directory you want, the name must be given without
+	  trailing slash. Examples:
+	  % setenv E_TMPDIR .
+	  % setenv E_TMPDIR /scratch/user
+	  It is a good idea to set the temporary directory to a fast
+	  disk or filesystem. If this variable is not set, the default
+	  temporary directory is '.', the current working directory.
+
+	* E_LOGFILE declares the name of a log file. This feature is
+	  optional, it is helpful if you really need to log all eclipse
+	  messages to an external ASCII file. Declare the name with complete
+	  path name (e.g. /tmp/eclipse-log, or ~/eclipse-log). The log will
+	  start with a header describing the user name, machine name, PID,
+	  date and time of the process launch. Then all warnings, errors,
+	  comment, and compute status will log a message in this file. The
+	  format is not fixed, do not even think about parsing it with a
+	  software tool. If a format has to be chosen later on, it is very
+	  likely to be the one chosen for the DataFlow System in general.
+
+
+	If you have correctly compiled eclipse, you should now have a
+	program called 'e_setup' in eclipse/bin. Running this program will
+	issue a series of questions to help you set up the needed
+	environment variables.
+
+	You must provide the following informations:
+
+	- Where is the eclipse root directory situated on your machine?
+	- Should verbose mode be activated?
+	- Should debug mode be activated?
+	- What is the path to the temporary swap area?
+	- Should the log file mode be activated?
+
+	If you specify '.' (the current directory) as swap space area, it
+	means that every eclipse routine will try to use its current
+	working directory as swap area.
+
+	As the program ends, a new file called ~/.eclipse-rc is created,
+	in your home directory. Add the following line:
+
+	source ~/.eclipse-rc
+
+	to your .cshrc/.login or .bashrc/.profile init files on your
+	account. Notice that 'e_setup' will try to produce a file that can be
+	sourced by your default shell (sh/bash or csh/tcsh).
+
+	You might also want to have a machine-wide .eclipse-rc file.
+	In that case you would probably install eclipse in
+	/usr/local/eclipse or anything similar, run the e_setup command to
+	set eclipse for the local machine, then put the generated .eclipse-rc
+	file in a public place and ask your users to source this file.
+	Alternatively, you could also modify the default .cshrc file on
+	your machine to always source the .eclipse-rc upon login.
+
+
+	Security
+	--------
+
+	eclipse executables must not run with uid root.
+
+	The security aspects of this software package are
+	non-existent.  Installing such commands as uid root is a very
+	dangerous thing to do. Best would be to install the software
+	as a standard user and make all binaries executable for
+	everybody. There are probably many ways of using programs
+	with uid root to gain root access for local users.
+	You have been warned.
+
+
+
+	eclipse status for all supported Unix versions
+	----------------------------------------------
+
+	Supported platforms and compilers:
+	- Solaris : 2.5, 2.6 and 2.8 (cc/gcc)
+	- AIX     : 4.3 (cc/gcc)
+	- HPUX    : 10 and 11 (cc/gcc)
+	- Linux   : 2.X (gcc)
+	- OSF/1   : 4.0 (gcc)
+	- freeBSD : 4.2 (gcc)
+	- Darwin  : 6.2 (cc)
+
+
+	The following platforms might be Ok but are untested:
+	- HPUX 08 and HPUX 09.
+	- Linux kernels < 2.X
+	- SGI IRIX 6.5
+	
+	The following platforms will not be supported any more:
+	- Ultrix
+
+	An (unsuccessful) attempt has been made to port eclipse to Cygwin
+	using gcc. An include-file problem was (temporarily) solved with
+	cd /usr/include/sys; ln -s ../cygwin/ipc.h .; ln -s ../cygwin/shm.h .
+	After this the link-step in the build of most executables fails due
+	to undefined references to shmat and shmdt.
+
+	A note about single/double precision pixels
+	-------------------------------------------
+
+	The convention in use throughout eclipse is to work with single
+	precision pixels internally, i.e. all pixel buffers are float *,
+	which limits the precision to 32 bits in IEEE floating point format
+	for all pixel operations. This is usually enough for most data
+	reduction procedures, and gains time in terms of memory use.
+
+	You may want however to work with double precision pixels to
+	increase computation accuracy. Know that the memory use in much more
+	intensive in this case, the most probable case being that all cubes
+	will be swapped to disk for any pixel operation involving several
+	planes of a cube, the amount of time used for the same operation
+	being more than twice the one needed with single-precision pixels,
+	since disk accesses are usually a factor 1000 slower than memory
+	accesses.
+
+	Since version 2.1, it is possible to work with pixels stored as
+	double precision numbers. The FITS interfaces have been upgraded
+	to allow input and output in FITS -64 IEEE double format, and the
+	internal pixel representation may be double, on user request.
+
+	This change from single to double precision is not dynamic but can
+	only be requested at compilation time. The procedure to follow to
+	compile eclipse with double precision pixels is the following:
+
+	Edit the file eclipse/config.make to add to the line
+	starting with CFLAGS the symbol -DDOUBLEPIX.
+
+	   Example:
+
+	   CFLAGS = -D_ECLIPSE_ -O3                # before
+	   CFLAGS = -D_ECLIPSE_ -O3 -DDOUBLEPIX    # after
+
+	
+	Remove and recompile everything:
+
+	% make veryclean
+	% make
+	
+	Pixels are now stored in double precision format internally.
+	Know that this internal data format has not been extensively tested,
+	though. 
+
+----------------------------------------------------------------
+Contact the eclipse team (eclipse-team@eso.org) for any problem.
+----------------------------------------------------------------
+
