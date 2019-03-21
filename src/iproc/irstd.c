@@ -299,7 +299,7 @@ irstd * irstd_get_star_magnitude_one_cat(
     irstd       *   refstar ;
     
     /* Test entries */
-    if (cat == NULL) return ;
+    if (cat == NULL) return NULL ;
     if (!strcmp(cat, "all")) return NULL ;
     
     /* Search closest star */
