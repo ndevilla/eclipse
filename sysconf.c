@@ -465,7 +465,7 @@ void make_config_make()
 
 		case COMPILER_GCC:	
         fprintf(sysc, "CC      = gcc\n");
-        fprintf(sysc, "CFLAGS  = -D_ECLIPSE_ ");
+        fprintf(sysc, "CFLAGS  = -D_ECLIPSE_ -std=c89 ");
 		if (config.with_threads) {
 			fprintf(sysc, "-pthread ");
 		}
